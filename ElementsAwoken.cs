@@ -16,7 +16,6 @@ using ElementsAwoken.EASystem.UI;
 using ElementsAwoken.EAUtilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoMod.Cil;
 using Newtonsoft.Json;
 using ReLogic.Content;
 using ReLogic.Graphics;
@@ -152,8 +151,6 @@ namespace ElementsAwoken
         }
         public override void Load()
         {
-            Terraria.IL_Player.Update += RemoveManaCap;
-
             DateTime now = DateTime.Today;
             if (now.Day == 1 && now.Month == 4) aprilFools = true;
 
@@ -1294,20 +1291,6 @@ namespace ElementsAwoken
                     modPlayer.screenshakeAmount = amount;
                 }
             }
-        }
-        private void RemoveManaCap(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-
-            if (!cursor.TryGotoNext(MoveType.Before,
-                                    i => i.MatchLdfld("Terraria.Player", "statManaMax2"),
-                                    i => i.MatchLdcI4(400)))
-            {
-                Logger.Fatal("Could not find instruction to patch");
-                return;
-            }
-
-            cursor.Next.Next.Operand = int.MaxValue;
         }
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
