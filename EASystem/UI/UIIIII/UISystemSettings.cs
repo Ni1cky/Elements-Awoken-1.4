@@ -106,7 +106,12 @@ namespace ElementsAwoken.EASystem.UI.UIIIII
         public override void UpdateUI(GameTime gameTime)
         {
             _lastUpdateUiGameTime = gameTime;
-            if (Panel)
+            // Panel is a world flag (boss prompts have been activated in this world). Whether this character has already
+            // closed the info popup is stored per player, so closing it is not undone by the next world sync in multiplayer.
+            bool showPromptInfo = Panel && !Main.gameMenu
+                && !ModContent.GetInstance<ServerConfig>().promptsDisabled
+                && !Main.LocalPlayer.GetModPlayer<BossPromptInfoPlayer>().seenBossPromptInfo;
+            if (showPromptInfo)
             {
                 if (MyInterface?.CurrentState == null)
                 {
