@@ -562,27 +562,77 @@ namespace ElementsAwoken.EASystem
             sanityRegens.Add(amount);
             sanityRegensName.Add(type);
         }
+
+        // Sanity and kill counters are tracked on the client that owns the player.
+        // Events detected on the server (NPC deaths, items in the world) are sent to the affected clients.
+        public enum SanityEventType : byte
+        {
+            BossKilled,
+            EnemyKilled,
+            GuideVoodooDollBurned,
+        }
+        /// <summary>
+        /// Applies a sanity event to the given player. Called in singleplayer, or on the client that owns the player.
+        /// </summary>
+        public static void ApplySanityEvent(Player player, SanityEventType type)
+        {
+            AwakenedPlayer modPlayer = player.GetModPlayer<AwakenedPlayer>();
+            PlayerUtils playerUtils = player.GetModPlayer<PlayerUtils>();
+            switch (type)
+            {
+                case SanityEventType.BossKilled:
+                    if (MyWorld.awakenedMode)
+                    {
+                        if (playerUtils.bossesKilledLastFiveMin < 3)
+                        {
+                            modPlayer.sanity += modPlayer.sanityMax / 5;
+                        }
+                        else
+                        {
+                            modPlayer.sanity -= 8;
+                        }
+                    }
+                    playerUtils.RecordBossKill();
+                    break;
+                case SanityEventType.EnemyKilled:
+                    playerUtils.RecordEnemyKill();
+                    break;
+                case SanityEventType.GuideVoodooDollBurned:
+                    if (MyWorld.awakenedMode)
+                    {
+                        modPlayer.sanity -= 20;
+                    }
+                    break;
+            }
+        }
+        /// <summary>
+        /// Called in singleplayer or on the server. In singleplayer the event is applied to the local player;
+        /// on the server it is sent to the given player's client, or to all clients if <paramref name="playerIndex"/> is -1.
+        /// </summary>
+        public static void SendSanityEvent(SanityEventType type, int playerIndex = -1)
+        {
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                ApplySanityEvent(Main.LocalPlayer, type);
+            }
+            else if (Main.netMode == NetmodeID.Server)
+            {
+                ModPacket packet = ModContent.GetInstance<ElementsAwoken>().GetPacket();
+                packet.Write((byte)ElementsAwoken.ElementsAwokenMessageType.SanityEvent);
+                packet.Write((byte)type);
+                packet.Send(playerIndex);
+            }
+        }
+        public static bool IsValidPlayer(int playerIndex) => playerIndex >= 0 && playerIndex < Main.maxPlayers && Main.player[playerIndex].active;
     }
     class SanityNPC : GlobalNPC
     {
         public override void OnKill(NPC npc)
         {
-            Player player = Main.player[Main.myPlayer];
-            AwakenedPlayer modPlayer = player.GetModPlayer<AwakenedPlayer>();
-            PlayerUtils playerUtils = player.GetModPlayer<PlayerUtils>();
-            if (MyWorld.awakenedMode)
+            // OnKill only runs in singleplayer or on the server. Every player gets the boss kill event.
+            if (npc.boss)
             {
-                if (npc.boss)
-                {
-                    if (playerUtils.bossesKilledLastFiveMin < 3)
-                    {
-                        modPlayer.sanity += modPlayer.sanityMax / 5;
-                    }
-                    else
-                    {
-                        modPlayer.sanity -= 8;
-                    }
-                }
+                AwakenedPlayer.SendSanityEvent(AwakenedPlayer.SanityEventType.BossKilled);
             }
         }
     }
@@ -604,15 +654,16 @@ namespace ElementsAwoken.EASystem
         }
         public override void Update(Item item, ref float gravity, ref float maxFallSpeed)
         {
-            Player player = Main.player[item.playerIndexTheItemIsReservedFor];
-            AwakenedPlayer modPlayer = player.GetModPlayer<AwakenedPlayer>();
             if (MyWorld.awakenedMode)
             {
                 reduceSanityCD--;
                 if (item.type == ItemID.GuideVoodooDoll && Collision.LavaCollision(item.position, item.width, item.height) && Main.netMode != NetmodeID.MultiplayerClient && NPC.AnyNPCs(NPCID.Guide) && reduceSanityCD <= 0)
                 {
                     reduceSanityCD = 5;
-                    modPlayer.sanity -= 20;
+                    // The item is reserved for the player who dropped it. If that player is unknown, everyone is affected,
+                    // since the Wall of Flesh is summoned for everyone.
+                    int owner = item.playerIndexTheItemIsReservedFor;
+                    AwakenedPlayer.SendSanityEvent(AwakenedPlayer.SanityEventType.GuideVoodooDollBurned, AwakenedPlayer.IsValidPlayer(owner) ? owner : -1);
                     ElementsAwoken.DebugModeText("voodoll drain");
                 }
             }

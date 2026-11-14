@@ -1319,6 +1319,13 @@ namespace ElementsAwoken
                     int energy = reader.ReadInt32();
                     energyPlayer.energy = energy;
                     break;
+                case ElementsAwokenMessageType.SanityEvent:
+                    AwakenedPlayer.SanityEventType sanityEvent = (AwakenedPlayer.SanityEventType)reader.ReadByte();
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        AwakenedPlayer.ApplySanityEvent(Main.LocalPlayer, sanityEvent);
+                    }
+                    break;
                 default:
                     Logger.WarnFormat("Elements Awoken: Unknown Message type: {0}", msgType);
                     break;
@@ -1330,6 +1337,7 @@ namespace ElementsAwoken
             AwakenedSync,
             EnergySync,
             Storyteller,
+            SanityEvent,
         }
     }
 }

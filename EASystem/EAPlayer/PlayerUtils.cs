@@ -189,6 +189,31 @@ namespace ElementsAwoken.EASystem
                 return false;
             }
         }
+        public void RecordBossKill()
+        {
+            for (int i = 0; i < bossKilledCD.Length; i++)
+            {
+                if (bossKilledCD[i] <= 0)
+                {
+                    bossKilledCD[i] = 18000;
+                    break;
+                }
+            }
+            ElementsAwoken.DebugModeText("boss killed");
+            ElementsAwoken.DebugModeText("bosses killed last min: " + (bossesKilledLastMin + 1));
+            ElementsAwoken.DebugModeText("bosses killed last five min: " + (bossesKilledLastFiveMin + 1));
+        }
+        public void RecordEnemyKill()
+        {
+            for (int i = 0; i < enemiesKilledCD.Length; i++)
+            {
+                if (enemiesKilledCD[i] <= 0)
+                {
+                    enemiesKilledCD[i] = 3600;
+                    break;
+                }
+            }
+        }
         public override void PostSellItem(NPC vendor, Item[] shopInventory, Item item)
         {
             for (int i = 0; i < salesCD.Length; i++)
@@ -240,31 +265,15 @@ namespace ElementsAwoken.EASystem
     {
         public override void OnKill(NPC npc)
         {
-            Player player = Main.player[Main.myPlayer];
-            PlayerUtils modPlayer = player.GetModPlayer<PlayerUtils>();
-            if (npc.boss)
+            // OnKill only runs in singleplayer or on the server.
+            // Boss kills are recorded for every player by SanityNPC (AwakenedPlayer.SanityEventType.BossKilled).
+            if (!npc.boss && !npc.friendly && !npc.SpawnedFromStatue)
             {
-                for (int i = 0; i < modPlayer.bossKilledCD.Length; i++)
+                // The kill is credited to the player who last hit the NPC.
+                int killer = Main.netMode == NetmodeID.SinglePlayer ? Main.myPlayer : npc.lastInteraction;
+                if (AwakenedPlayer.IsValidPlayer(killer))
                 {
-                    if (modPlayer.bossKilledCD[i] <= 0)
-                    {
-                        modPlayer.bossKilledCD[i] = 18000;
-                        break;
-                    }
-                }
-                ElementsAwoken.DebugModeText("boss killed");
-                ElementsAwoken.DebugModeText("bosses killed last min: " + (modPlayer.bossesKilledLastMin + 1));
-                ElementsAwoken.DebugModeText("bosses killed last five min: " + (modPlayer.bossesKilledLastFiveMin + 1));
-            }
-            else if (!npc.friendly && !npc.SpawnedFromStatue)
-            {
-                for (int i = 0; i < modPlayer.enemiesKilledCD.Length; i++)
-                {
-                    if (modPlayer.enemiesKilledCD[i] <= 0)
-                    {
-                        modPlayer.enemiesKilledCD[i] = 3600;
-                        break;
-                    }
+                    AwakenedPlayer.SendSanityEvent(AwakenedPlayer.SanityEventType.EnemyKilled, killer);
                 }
             }
         }
