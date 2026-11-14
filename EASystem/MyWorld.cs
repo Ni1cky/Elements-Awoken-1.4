@@ -484,7 +484,7 @@ namespace ElementsAwoken
             string Azana = this.GetLocalization("Azana").Value;
             string Azana1 = this.GetLocalization("Azana1").Value;
 
-            if (!ModContent.GetInstance<Config>().promptsDisabled)
+            if (!ModContent.GetInstance<ServerConfig>().promptsDisabled)
             {
                 if (NPC.downedBoss1 && !downedWasteland) desertPrompt++;
                 else desertPrompt = 0;
@@ -679,7 +679,7 @@ namespace ElementsAwoken
         #region lab gen
         public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
         {
-            if (!ModContent.GetInstance<Config>().labsDisabled)
+            if (!ModContent.GetInstance<ServerConfig>().labsDisabled)
             {
                 int genIndex2 = tasks.FindIndex(genpass => genpass.Name.Equals("Buried Chests"));
                 tasks.Insert(genIndex2 + 2, new PassLegacy("Generating Labs", delegate (GenerationProgress progress, GameConfiguration configuration)

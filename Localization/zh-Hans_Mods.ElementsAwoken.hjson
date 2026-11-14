@@ -8849,6 +8849,8 @@ Configs: {
 		DisplayName: EA觉醒元素 配置
 		screenshakeDisabled.Tooltip: ""
 	}
+
+	ServerConfig.DisplayName: EA觉醒元素 服务器配置
 }
 
 Config: {
@@ -8862,7 +8864,7 @@ Config: {
 	DisableBoss: 禁用Boss提示
 	Disablestheeffects: 禁用在击败Boss后30分钟内世界上发生的负面效果
 	ItemChanges: 禁用原版物品改动
-	vanillaitems: 禁用对原版物品的所有改动，例如为以前无法制作的物品添加新配方
+	vanillaitems: 禁用EA觉醒元素对原版物品属性的改动，例如最后的棱镜
 	Screenshake: 禁用屏幕震动
 	LowDust: 低尘模式
 	Reduces: 减少NPC、投射物等产生的尘埃数量（警告：仅适用于某些对象）

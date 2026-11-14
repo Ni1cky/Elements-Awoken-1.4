@@ -162,7 +162,7 @@ namespace ElementsAwoken.NPCs.Town
             }
             string addText = "";
 
-            if (ModContent.GetInstance<Config>().alchemistPotions)
+            if (ModContent.GetInstance<ServerConfig>().alchemistPotions)
             {
                 if (shopNumber == 0)
                 {
@@ -189,7 +189,7 @@ namespace ElementsAwoken.NPCs.Town
         {
             button = Language.GetTextValue("LegacyInterface.28");
             if (shopNumber == 3) button = this.GetLocalization("ButtonName.Name").Value;
-            if (ModContent.GetInstance<Config>().alchemistPotions) button2 = this.GetLocalization("ButtonName.Name1").Value;
+            if (ModContent.GetInstance<ServerConfig>().alchemistPotions) button2 = this.GetLocalization("ButtonName.Name1").Value;
             else button2 = this.GetLocalization("ButtonName.Name2").Value;
         }
 
@@ -197,7 +197,7 @@ namespace ElementsAwoken.NPCs.Town
         {
             if (firstButton)
             {
-                if (ModContent.GetInstance<Config>().alchemistPotions)
+                if (ModContent.GetInstance<ServerConfig>().alchemistPotions)
                 {
                     if (shopNumber < 3) shopName = "AlchemistShop";
                     else
@@ -214,7 +214,7 @@ namespace ElementsAwoken.NPCs.Town
             }
             else
             {
-                if (ModContent.GetInstance<Config>().alchemistPotions)
+                if (ModContent.GetInstance<ServerConfig>().alchemistPotions)
                 {
                     shopNumber = shopNumber + 1 % NumberShops;
                     if (shopNumber > 3)
@@ -249,8 +249,8 @@ namespace ElementsAwoken.NPCs.Town
         }
         public override void AddShops()
         {
-            Condition IfEnabled = new(EALocalization.ShopNeme(), () => ModContent.GetInstance<Config>().alchemistPotions);
-            Condition IfEnabledFalse = new(EALocalization.ShopNeme(false), () => ModContent.GetInstance<Config>().alchemistPotions == false);
+            Condition IfEnabled = new(EALocalization.ShopNeme(), () => ModContent.GetInstance<ServerConfig>().alchemistPotions);
+            Condition IfEnabledFalse = new(EALocalization.ShopNeme(false), () => ModContent.GetInstance<ServerConfig>().alchemistPotions == false);
             Condition ShopName0 = new(EALocalization.ShopNeme(0), () => shopNumber == 0);
             Condition ShopName1 = new(EALocalization.ShopNeme(1), () => shopNumber == 1);
             Condition ShopName2 = new(EALocalization.ShopNeme(2), () => shopNumber == 2);

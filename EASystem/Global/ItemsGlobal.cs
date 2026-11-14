@@ -89,7 +89,7 @@ namespace ElementsAwoken.EASystem.Global
                 item.shoot = ModContent.ProjectileType<BioLightning>();
                 item.consumable = true;
             }
-            if (!ModContent.GetInstance<Config>().vItemChangesDisabled)
+            if (!ModContent.GetInstance<ServerConfig>().vItemChangesDisabled)
             {
                 if (item.type == ItemID.SpaceGun)
                 {

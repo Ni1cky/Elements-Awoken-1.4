@@ -8811,6 +8811,8 @@ Configs: {
 		DisplayName: Elements Awoken Config
 		screenshakeDisabled.Tooltip: ""
 	}
+
+	ServerConfig.DisplayName: Elements Awoken Server Config
 }
 
 Config: {
@@ -8824,7 +8826,7 @@ Config: {
 	DisableBoss: Disable Boss Prompts
 	Disablestheeffects: Disables the negative effects that happen in the world 30 minutes after beating a boss
 	ItemChanges: Disable Vanilla Item Changes
-	vanillaitems: Disables all changes to vanilla items, like new recipes for previously uncraftable items
+	vanillaitems: Disables Elements Awoken changes to vanilla item stats, like the Last Prism and Space Gun
 	Screenshake: Disable Screenshake
 	LowDust: Low Dust Mode
 	Reduces: Reduces the amount of dust created by NPCs, projectiles and more (WARNING: only applied to certain objects)

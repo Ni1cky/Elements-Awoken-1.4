@@ -355,7 +355,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.CosmicObserver
                         desiredY = NPC.Center.Y;
                     }
                 }
-                if (ModContent.GetInstance<Config>().debugMode)
+                if (ModContent.GetInstance<ServerConfig>().debugMode)
                 {
                     Dust dust = Main.dust[Dust.NewDust(floatCenter, 2, 2, 6)];
                     dust.noGravity = true;

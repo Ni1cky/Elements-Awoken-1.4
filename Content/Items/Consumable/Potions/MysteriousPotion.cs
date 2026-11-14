@@ -58,7 +58,7 @@ namespace ElementsAwoken.Content.Items.Consumable.Potions
         }
         public override bool OnPickup(Player player)
         {
-            if (ModContent.GetInstance<Config>().debugMode) potionNum = Main.rand.Next(10);
+            if (ModContent.GetInstance<ServerConfig>().debugMode) potionNum = Main.rand.Next(10);
             return base.OnPickup(player);
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
@@ -120,7 +120,7 @@ namespace ElementsAwoken.Content.Items.Consumable.Potions
                 if (line2.Mod == "Terraria" && line2.Name.StartsWith("Tooltip"))
                 {
                     line2.Text = desc;
-                    if (ModContent.GetInstance<Config>().debugMode)
+                    if (ModContent.GetInstance<ServerConfig>().debugMode)
                     {
                         line2.Text += "\npotionNum:" + potionNum + "\ncolor:" + MyWorld.mysteriousPotionColours[potionNum];
                     }
@@ -169,7 +169,7 @@ namespace ElementsAwoken.Content.Items.Consumable.Potions
             else if (potionNum == 9) player.AddBuff(ModContent.BuffType<SuperSpeed>(), 600);
 
             modPlayer.mysteriousPotionsDrank[potionNum] = true;
-            if (ModContent.GetInstance<Config>().debugMode) Item.stack++;
+            if (ModContent.GetInstance<ServerConfig>().debugMode) Item.stack++;
             return base.ConsumeItem(player);
         }
         public override void PostDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)

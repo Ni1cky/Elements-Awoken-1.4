@@ -30,7 +30,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     projectile.damage = (int)(projectile.damage * 1.5f);
                 }
             }
-            if (!ModContent.GetInstance<Config>().vItemChangesDisabled)
+            if (!ModContent.GetInstance<ServerConfig>().vItemChangesDisabled)
             {
                 if (projectile.type == ProjectileID.GreenLaser)
                 {
@@ -95,7 +95,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     expr_B72_cp_0.velocity.Y = expr_B72_cp_0.velocity.Y * 2f;
                 }
             }
-            if (!ModContent.GetInstance<Config>().vItemChangesDisabled)
+            if (!ModContent.GetInstance<ServerConfig>().vItemChangesDisabled)
             {
                 if (projectile.type == ProjectileID.LastPrismLaser)
                 {
@@ -117,7 +117,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
             var source = projectile.GetSource_FromThis();
             bool crit = hit.Crit;
 
-            if (!ModContent.GetInstance<Config>().vItemChangesDisabled)
+            if (!ModContent.GetInstance<ServerConfig>().vItemChangesDisabled)
             {
                 if (projectile.type == ProjectileID.LastPrismLaser)
                 {

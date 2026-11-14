@@ -373,7 +373,7 @@ namespace ElementsAwoken
         public static void DebugModeText(object text, int r = 255, int g = 255, int b = 255)
         {
             Color color = new Color(r, g, b);
-            if (ModContent.GetInstance<Config>().debugMode)
+            if (ModContent.GetInstance<ServerConfig>().debugMode)
             {
                 Main.NewText(text, color);
             }
@@ -381,7 +381,7 @@ namespace ElementsAwoken
         public static void DebugModeNetworkText(string text, int r = 255, int g = 255, int b = 255)
         {
             Color color = new Color(r, g, b);
-            if (ModContent.GetInstance<Config>().debugMode)
+            if (ModContent.GetInstance<ServerConfig>().debugMode)
             {
                 NetworkText f = NetworkText.FromLiteral(text);
                 ChatHelper.BroadcastChatMessage(f, color);
@@ -390,7 +390,7 @@ namespace ElementsAwoken
         public static void DebugModeCombatText(string text, Rectangle rect, int r = 255, int g = 255, int b = 255)
         {
             Color color = new Color(r, g, b);
-            if (ModContent.GetInstance<Config>().debugMode)
+            if (ModContent.GetInstance<ServerConfig>().debugMode)
             {
                 CombatText.NewText(rect, color, text, true, false);
             }

@@ -94,7 +94,7 @@ namespace ElementsAwoken.Content.Items.BossDrops.Ancients
                     else if (player.FindBuffIndex(ModContent.BuffType<ArchaicProtectionCD>()) == -1)
                     {
                         modPlayer.archaicProtectionTimer = 1200;
-                        player.AddBuff(ModContent.BuffType<ArchaicProtectionCD>(), ModContent.GetInstance<Config>().debugMode ? 60 : 3600); // 3600
+                        player.AddBuff(ModContent.BuffType<ArchaicProtectionCD>(), ModContent.GetInstance<ServerConfig>().debugMode ? 60 : 3600); // 3600
                     }
                     reuseKeyTimer = 20;
                 }

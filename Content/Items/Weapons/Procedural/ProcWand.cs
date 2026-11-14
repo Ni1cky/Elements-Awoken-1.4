@@ -64,7 +64,7 @@ namespace ElementsAwoken.Content.Items.Weapons.Procedural
         }
         public override bool OnPickup(Player player)
         {
-            if (ModContent.GetInstance<Config>().debugMode) variant = Main.rand.Next(2);
+            if (ModContent.GetInstance<ServerConfig>().debugMode) variant = Main.rand.Next(2);
             return base.OnPickup(player);
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
@@ -78,7 +78,7 @@ namespace ElementsAwoken.Content.Items.Weapons.Procedural
                 if (line2.Mod == "Terraria" && line2.Name.Contains("ItemName"))
                 {
                     line2.Text = name + " Wand";
-                    if (ModContent.GetInstance<Config>().debugMode) line2.Text += " " + variant;
+                    if (ModContent.GetInstance<ServerConfig>().debugMode) line2.Text += " " + variant;
                 }
             }
         }
