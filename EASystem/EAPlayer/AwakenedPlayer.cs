@@ -90,7 +90,10 @@ namespace ElementsAwoken.EASystem
             sanityMax = sanityIncreaser;
             craftWeaponCooldown--;
             aleCD--;
-            if (MyWorld.awakenedMode)
+            // Sanity only matters on the client that owns the player: it affects that player's damage and is shown in
+            // their UI, and it is not synced afterwards. Simulating it for other players and on the server
+            // (scanning tiles and NPCs around each of them every tick) was wasted work.
+            if (MyWorld.awakenedMode && Player.whoAmI == Main.myPlayer)
             {
                 // if (sanity > 0)
                 {
