@@ -86,16 +86,20 @@ namespace ElementsAwoken.EASystem
             #endregion
 
             #region darkness
-            Point topLeft = ((Player.TopLeft) / 16).ToPoint();
-            Point bottomRight = ((Player.BottomRight) / 16).ToPoint();
-
-            for (int i = topLeft.X; i <= bottomRight.X; i++)
+            // Lighting is not available on a dedicated server.
+            if (!Main.dedServ)
             {
-                for (int j = topLeft.Y; j <= bottomRight.Y; j++)
+                Point topLeft = ((Player.TopLeft) / 16).ToPoint();
+                Point bottomRight = ((Player.BottomRight) / 16).ToPoint();
+
+                for (int i = topLeft.X; i <= bottomRight.X; i++)
                 {
-                    if (Lighting.Brightness(i, j) > playerBrightestLight)
+                    for (int j = topLeft.Y; j <= bottomRight.Y; j++)
                     {
-                        playerBrightestLight = Lighting.Brightness(i, j);
+                        if (Lighting.Brightness(i, j) > playerBrightestLight)
+                        {
+                            playerBrightestLight = Lighting.Brightness(i, j);
+                        }
                     }
                 }
             }

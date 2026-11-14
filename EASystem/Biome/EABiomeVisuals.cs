@@ -12,6 +12,10 @@ namespace ElementsAwoken.EASystem.Biome
     {
         public override void PostUpdateEverything()
         {
+            // Screen filters and skies are only created on clients (see ElementsAwoken.Load), so there is nothing to update on a dedicated server.
+            if (Main.dedServ)
+                return;
+
             MyPlayer Leviathan = Main.LocalPlayer.GetModPlayer<MyPlayer>();
             Player player = Main.LocalPlayer;
 
