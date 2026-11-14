@@ -137,34 +137,13 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 }
             }
         }
-        public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
+        // Elite type 4 (shield): takes 50% less damage while above half health.
+        // Damage must be reduced in ModifyIncomingHit; OnHitBy* hooks run after the damage has already been applied.
+        public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
         {
-            if (elite == 4)
+            if (elite == 4 && npc.life > npc.lifeMax / 2)
             {
-                if (npc.life > npc.lifeMax / 2)
-                {
-                    hit.Damage = (int)(hit.Damage * 0.5f);
-                }
-            }
-        }
-        public override void OnHitNPC(NPC npc, NPC target, NPC.HitInfo hit)
-        {
-            if (elite == 4)
-            {
-                if (npc.life > npc.lifeMax / 2)
-                {
-                    hit.Damage = (int)(hit.Damage * 0.5f);
-                }
-            }
-        }
-        public override void OnHitByItem(NPC npc, Player player, Item item, NPC.HitInfo hit, int damageDone)
-        {
-            if (elite == 4)
-            {
-                if (npc.life > npc.lifeMax / 2)
-                {
-                    hit.Damage = (int)(hit.Damage * 0.5f);
-                }
+                modifiers.FinalDamage *= 0.5f;
             }
         }
         public override void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
