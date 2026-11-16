@@ -13,23 +13,20 @@ namespace ElementsAwoken.EASystem
             Player player = Main.player[Main.myPlayer];
             MyPlayer modPlayer = player.GetModPlayer<MyPlayer>();
 
-            var encounter = ElementsAwoken.encounter;
-            var encounterTimer = ElementsAwoken.encounterTimer;
-            var encounterSetup = ElementsAwoken.encounterSetup;
-
             if (!Main.gameMenu)
             {
-                if (encounter != 0)
+                // encounterSetup must be changed in the static field, otherwise the setup (which resets the encounter text) runs every tick.
+                // The encounter's progress and its end are handled by MyPlayer through UISystemSettings.VoidTime.
+                int encounter = ElementsAwoken.encounter;
+                if (encounter == 0)
                 {
-                    encounterTimer--;
-                    if (encounterTimer <= 0)
+                    ElementsAwoken.encounterSetup = false; // ready for the next encounter
+                }
+                else
+                {
+                    if (!ElementsAwoken.encounterSetup)
                     {
-                        encounterTimer = 0;
-                        encounter = 0;
-                    }
-                    if (!encounterSetup)
-                    {
-                        encounterSetup = true;
+                        ElementsAwoken.encounterSetup = true;
                         modPlayer.encounterTextTimer = 0;
                         if (encounter >= 2)
                         {
@@ -37,10 +34,6 @@ namespace ElementsAwoken.EASystem
                             Main.raining = true;
                             Main.maxRaining = 0.8f;
                         }
-                    }
-                    if (encounter == 1)
-                    {
-                        if (encounterTimer <= 1600) encounterTimer = 0;
                     }
                     if (encounter == 2)
                     {

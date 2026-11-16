@@ -149,6 +149,7 @@ namespace ElementsAwoken
             ElementsAwoken.encounter = 0;
             ElementsAwoken.encounterTimer = 0;
             ElementsAwoken.encounterSetup = false;
+            EASystem.UI.UIIIII.UISystemSettings.VoidTime = 0; // an encounter interrupted by leaving the world must not continue in the next one
             aqueousDrive = false;
             azanaDrive = false;
             celestialDrive = false;
