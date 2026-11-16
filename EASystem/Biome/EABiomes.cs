@@ -48,15 +48,18 @@ namespace ElementsAwoken.EASystem.Biome
             _useInfernace = NPC.AnyNPCs(ModContent.NPCType<Infernace>());      
             _temple = BiomeTileCounterSystem._lizardTiles >= 50;
 
-            if (player.GetModPlayer<MyPlayer>().useAncients = _useAncients) return _useAncients;
-            if (player.GetModPlayer<MyPlayer>().useAzana = _useAzana) return _useAzana;
-            if (player.GetModPlayer<MyPlayer>().useLeviathan = _leviathan) return _leviathan;
-            if (player.GetModPlayer<MyPlayer>().useVolcanox = _volcanox) return _volcanox;
-            if (player.GetModPlayer<MyPlayer>().useGuardian = _useGuardian) return _useGuardian;
-            if (player.GetModPlayer<MyPlayer>().useAqueous = _useAqueous) return _useAqueous;
-            if (player.GetModPlayer<MyPlayer>().usePermafrost = _usePermafrost) return _usePermafrost;
-            if (player.GetModPlayer<MyPlayer>().useInfernace = _useInfernace) return _useInfernace;
-            if (MyPlayer.zoneTemple = _temple) return _temple;
+            // Every flag is updated on every call. With early returns, a flag further down kept its old value while
+            // anything above it was active (a boss alive, the player in the temple, an event...), so its screen filter stayed on.
+            MyPlayer modPlayer = player.GetModPlayer<MyPlayer>();
+            modPlayer.useAncients = _useAncients;
+            modPlayer.useAzana = _useAzana;
+            modPlayer.useLeviathan = _leviathan;
+            modPlayer.useVolcanox = _volcanox;
+            modPlayer.useGuardian = _useGuardian;
+            modPlayer.useAqueous = _useAqueous;
+            modPlayer.usePermafrost = _usePermafrost;
+            modPlayer.useInfernace = _useInfernace;
+            MyPlayer.zoneTemple = _temple;
             #endregion
 
             #region Event
@@ -64,37 +67,25 @@ namespace ElementsAwoken.EASystem.Biome
             _useVoidEventDark = MyWorld.voidInvasionUp && Main.time > 16220 && !Main.dayTime;
             _useRadRain = MyWorld.radiantRain && player.position.Y / 16 < Main.worldSurface;
 
-            if (player.GetModPlayer<MyPlayer>().useVoidEvent = _useVoidEvent) return _useVoidEvent;
-            if (player.GetModPlayer<MyPlayer>().useVoidEventDark = _useVoidEventDark) return _useVoidEventDark;
-            if (player.GetModPlayer<MyPlayer>().useRadRain = _useRadRain) return _useRadRain;
+            modPlayer.useVoidEvent = _useVoidEvent;
+            modPlayer.useVoidEventDark = _useVoidEventDark;
+            modPlayer.useRadRain = _useRadRain;
             #endregion
 
             #region Regaroth
-            for (int i = 0; i < Main.npc.Length; ++i)
+            int regarothType = ModContent.NPCType<RegarothHead>();
+            int regaroth = NPC.FindFirstNPC(regarothType);
+            if (regaroth >= 0)
             {
-                if (Main.npc[i].active && Main.npc[i].type == ModContent.NPCType<RegarothHead>())
-                {
-                    if (Main.npc[i].life > Main.npc[i].lifeMax / 2)
-                    {
-                        player.GetModPlayer<MyPlayer>().useRegaroth = 1;
-                        if (Main.npc[i].localAI[1] == 1)
-                        {
-                            player.GetModPlayer<MyPlayer>().useRegaroth = 3;
-                        }
-                    }
-                    else
-                    {
-                        player.GetModPlayer<MyPlayer>().useRegaroth = 2;
-                        if (Main.npc[i].localAI[1] == 1)
-                        {
-                            player.GetModPlayer<MyPlayer>().useRegaroth = 4;
-                        }
-                    }
-                }
-                if (Main.npc[i].active == false && Main.npc[i].type == ModContent.NPCType<RegarothHead>())
-                {
-                    player.GetModPlayer<MyPlayer>().useRegaroth = 0;
-                }
+                NPC npc = Main.npc[regaroth];
+                bool intense = npc.localAI[1] == 1;
+                if (npc.life > npc.lifeMax / 2) modPlayer.useRegaroth = intense ? 3 : 1;
+                else modPlayer.useRegaroth = intense ? 4 : 2;
+            }
+            else
+            {
+                // previously only reset when an inactive NPC slot still had Regaroth's type, which is not guaranteed once the slot is reused
+                modPlayer.useRegaroth = 0;
             }
             #endregion
 
@@ -103,13 +94,14 @@ namespace ElementsAwoken.EASystem.Biome
             _useEncounter2 = ElementsAwoken.encounter == 2;
             _useEncounter3 = ElementsAwoken.encounter == 3;
 
-            if (player.GetModPlayer<MyPlayer>().useEncounter1 = _useEncounter1) return _useEncounter1;
-            if (player.GetModPlayer<MyPlayer>().useEncounter2 = _useEncounter2) return _useEncounter2;
-            if (player.GetModPlayer<MyPlayer>().useEncounter3 = _useEncounter3) return _useEncounter3;
+            modPlayer.useEncounter1 = _useEncounter1;
+            modPlayer.useEncounter2 = _useEncounter2;
+            modPlayer.useEncounter3 = _useEncounter3;
             #endregion
 
-
-            return false;
+            return _useAncients || _useAzana || _leviathan || _volcanox || _useGuardian || _useAqueous || _usePermafrost || _useInfernace || _temple
+                || _useVoidEvent || _useVoidEventDark || _useRadRain
+                || _useEncounter1 || _useEncounter2 || _useEncounter3;
         }
         public override string BestiaryIcon => "ElementsAwoken/Extra/Bestiary/icon_small";
         public override SceneEffectPriority Priority => SceneEffectPriority.BiomeHigh;

@@ -341,7 +341,8 @@ namespace ElementsAwoken.EASystem.Biome
             {
                 Filters.Scene.Deactivate(ElementsAwoken.Blizzard);
             }
-            if (MyWorld.firePrompt > ElementsAwoken.bossPromptDelay && !player.GetModPlayer<MyPlayer>().ActiveBoss())
+            // the prompt counter keeps its value when prompts are disabled in the config, so the filter must check the config as well (like the debuff in MyPlayer)
+            if (!ModContent.GetInstance<ServerConfig>().promptsDisabled && MyWorld.firePrompt > ElementsAwoken.bossPromptDelay && !player.GetModPlayer<MyPlayer>().ActiveBoss())
             {
                 _InfernacesWrathSkyVisual = true;
             }
