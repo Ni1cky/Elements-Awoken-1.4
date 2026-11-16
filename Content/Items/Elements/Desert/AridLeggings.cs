@@ -19,8 +19,8 @@ namespace ElementsAwoken.Content.Items.Elements.Desert
         }
         public override void UpdateEquip(Player player)
         {
-            player.moveSpeed *= 1.2f;
-            player.pickSpeed -= 0.5f;
+            player.moveSpeed *= 1.1f;
+            player.pickSpeed -= 0.05f;
         }
         public override void AddRecipes()
         {
