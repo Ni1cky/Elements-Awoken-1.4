@@ -46,6 +46,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Wasteland
                 Main.dust[dust].scale = 1f;
                 Main.dust[dust].velocity *= 0.1f;
             }
+            aiTimer++;
             if (aiTimer >= 180) NPC.active = false;
         }
     }
