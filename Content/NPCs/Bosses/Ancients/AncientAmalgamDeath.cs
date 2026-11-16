@@ -112,11 +112,15 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Ancients
 
             float intensity = MathHelper.Lerp(0f, 1f, NPC.ai[0] / 450f);
             MoonlordDeathDrama.RequestLight(intensity, NPC.Center);
+            // AI runs on every machine: projectiles and the final strike come from the server (or singleplayer) only, the server syncs them to clients
             if (NPC.ai[1] == 0)
             {
-                for (int i = 0; i < 15; i++)
+                if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
-                    Projectile.NewProjectile(EAU.NPCs(NPC), NPC.Center.X, NPC.Center.Y, 0f, 0f, ModContent.ProjectileType<Lightbeam>(), 0, 0f, 0, i);
+                    for (int i = 0; i < 15; i++)
+                    {
+                        Projectile.NewProjectile(EAU.NPCs(NPC), NPC.Center.X, NPC.Center.Y, 0f, 0f, ModContent.ProjectileType<Lightbeam>(), 0, 0f, Main.myPlayer, i);
+                    }
                 }
                 NPC.ai[1]++;
             }
@@ -124,12 +128,15 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Ancients
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
-                NPC.SimpleStrikeNPC(NPC.life, 0, false, 0f, DamageClass.Default, false, 0, false);
-                Projectile.NewProjectile(EAU.NPCs(NPC), NPC.Center.X, NPC.Center.Y, 0f, 0f, ModContent.ProjectileType<DeathShockwave>(), 0, 0f);
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                {
+                    NPC.SimpleStrikeNPC(NPC.life, 0, false, 0f, DamageClass.Default, false, 0, false);
+                    Projectile.NewProjectile(EAU.NPCs(NPC), NPC.Center.X, NPC.Center.Y, 0f, 0f, ModContent.ProjectileType<DeathShockwave>(), 0, 0f, Main.myPlayer);
+                }
                 if (Main.netMode == 0 && !MyWorld.downedAncients) Projectile.NewProjectile(EAU.NPCs(NPC), NPC.Center.X, NPC.Center.Y, 0f, 0f, ModContent.ProjectileType<CreditsStarter>(), 0, 0f);
                 MyWorld.downedAncients = true;
+                if (Main.netMode == NetmodeID.Server) NetMessage.SendData(MessageID.WorldData); // Immediately inform clients of new world state.
             }
-            if (Main.netMode == NetmodeID.Server) NetMessage.SendData(MessageID.WorldData); // Immediately inform clients of new world state.
         }
     }
 }
