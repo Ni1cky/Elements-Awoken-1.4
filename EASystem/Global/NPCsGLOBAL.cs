@@ -2,6 +2,7 @@
 using ElementsAwoken.Content.Buffs.Other;
 using ElementsAwoken.Content.Buffs.PotionBuffs;
 using ElementsAwoken.Content.Dusts;
+using ElementsAwoken.Content.Events.VoidEvent.Enemies.Phase2.ShadeWyrm;
 using ElementsAwoken.Content.Items.Accessories;
 using ElementsAwoken.Content.Items.Donator.Buildmonger;
 using ElementsAwoken.Content.Items.Donator.Crow;
@@ -320,7 +321,9 @@ namespace ElementsAwoken.EASystem.EAPlayer
         {
             foreach (NPC npc in Main.ActiveNPCs)
             {
-                if (npc.boss && npc.ModNPC?.Mod == Mod) return true;
+                // The Shade Wyrm is only a Void Event miniboss (it got boss = true in the port, it didn't have it in 1.3), so it must not stop the event's own spawns.
+                // The Radiant Master is not skipped: it was a boss in 1.3 too, and Radiant Rain spawns stopped while it was alive there as well.
+                if (npc.boss && npc.ModNPC?.Mod == Mod && npc.ModNPC is not ShadeWyrm) return true;
             }
             return false;
         }
