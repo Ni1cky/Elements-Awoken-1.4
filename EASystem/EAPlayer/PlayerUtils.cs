@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -14,24 +15,28 @@ namespace ElementsAwoken.EASystem
         public float playerMaxLight = 1.3f;
 
         public int potionsConsumedLastMin = 0;
-        public int[] potionConsumedCD = new int[60];
-
         public int salesLastMin = 0;
-        public int[] salesCD = new int[9999];
-
         public int buysLastMin = 0;
-        public int[] buysCD = new int[9999];
-
         public int bossesKilledLastMin = 0;
         public int bossesKilledLastFiveMin = 0;
-        public int[] bossKilledCD = new int[999];
+        public int enemiesKilledLastMin = 0;
+        public int enemiesKilledLast10Secs = 0;
+
+        // Recent events are stored as the update count at which they happened, and dropped once they are older than
+        // the longest window they are counted in. This replaces fixed-size countdown arrays (up to 9999 entries each)
+        // that were fully scanned every tick for every player, even when empty.
+        private const uint TenSeconds = 600;
+        private const uint OneMinute = 3600;
+        private const uint FiveMinutes = 18000;
+        private uint updateCount = 0;
+        private readonly Queue<uint> potionConsumedTimes = new();
+        private readonly Queue<uint> saleTimes = new();
+        private readonly Queue<uint> buyTimes = new();
+        private readonly Queue<uint> bossKillTimes = new();
+        private readonly Queue<uint> enemyKillTimes = new();
 
         public bool pressingQuickBuff = false;
         public int pressingQuickBuffCD = 0;
-
-        public int enemiesKilledLastMin = 0;
-        public int enemiesKilledLast10Secs = 0;
-        public int[] enemiesKilledCD = new int[999];
 
         public int placingAutoDriller = 0;
         public override void ResetEffects()
@@ -86,16 +91,20 @@ namespace ElementsAwoken.EASystem
             #endregion
 
             #region darkness
-            Point topLeft = ((Player.TopLeft) / 16).ToPoint();
-            Point bottomRight = ((Player.BottomRight) / 16).ToPoint();
-
-            for (int i = topLeft.X; i <= bottomRight.X; i++)
+            // Lighting is not available on a dedicated server.
+            if (!Main.dedServ)
             {
-                for (int j = topLeft.Y; j <= bottomRight.Y; j++)
+                Point topLeft = ((Player.TopLeft) / 16).ToPoint();
+                Point bottomRight = ((Player.BottomRight) / 16).ToPoint();
+
+                for (int i = topLeft.X; i <= bottomRight.X; i++)
                 {
-                    if (Lighting.Brightness(i, j) > playerBrightestLight)
+                    for (int j = topLeft.Y; j <= bottomRight.Y; j++)
                     {
-                        playerBrightestLight = Lighting.Brightness(i, j);
+                        if (Lighting.Brightness(i, j) > playerBrightestLight)
+                        {
+                            playerBrightestLight = Lighting.Brightness(i, j);
+                        }
                     }
                 }
             }
@@ -108,54 +117,33 @@ namespace ElementsAwoken.EASystem
         }
         public override void PostUpdateMiscEffects()
         {
-            for (int i = 0; i < potionConsumedCD.Length; i++)
+            updateCount++;
+            potionsConsumedLastMin = CountRecent(potionConsumedTimes, OneMinute, OneMinute);
+            salesLastMin = CountRecent(saleTimes, OneMinute, OneMinute);
+            buysLastMin = CountRecent(buyTimes, OneMinute, OneMinute);
+            bossesKilledLastFiveMin = CountRecent(bossKillTimes, FiveMinutes, FiveMinutes);
+            bossesKilledLastMin = CountRecent(bossKillTimes, OneMinute, FiveMinutes);
+            enemiesKilledLastMin = CountRecent(enemyKillTimes, OneMinute, OneMinute);
+            enemiesKilledLast10Secs = CountRecent(enemyKillTimes, TenSeconds, OneMinute);
+        }
+        /// <summary>
+        /// Drops events older than <paramref name="keepWindow"/> and returns how many happened within the last <paramref name="window"/> updates.
+        /// </summary>
+        private int CountRecent(Queue<uint> times, uint window, uint keepWindow)
+        {
+            while (times.Count > 0 && updateCount - times.Peek() > keepWindow)
             {
-                if (potionConsumedCD[i] > 0)
+                times.Dequeue();
+            }
+            int count = 0;
+            foreach (uint time in times)
+            {
+                if (updateCount - time <= window)
                 {
-                    potionsConsumedLastMin++;
-                    potionConsumedCD[i]--;
+                    count++;
                 }
             }
-            for (int i = 0; i < salesCD.Length; i++)
-            {
-                if (salesCD[i] > 0)
-                {
-                    salesLastMin++;
-                    salesCD[i]--;
-                }
-            }
-            for (int i = 0; i < buysCD.Length; i++)
-            {
-                if (buysCD[i] > 0)
-                {
-                    buysLastMin++;
-                    buysCD[i]--;
-                }
-            }
-            for (int i = 0; i < bossKilledCD.Length; i++)
-            {
-                if (bossKilledCD[i] > 14400)
-                {
-                    bossesKilledLastMin++;
-                }
-                if (bossKilledCD[i] > 0)
-                {
-                    bossesKilledLastFiveMin++;
-                    bossKilledCD[i]--;
-                }
-            }
-            for (int i = 0; i < enemiesKilledCD.Length; i++)
-            {
-                if (enemiesKilledCD[i] > 3600 - 600)
-                {
-                    enemiesKilledLast10Secs++;
-                }
-                if (enemiesKilledCD[i] > 0)
-                {
-                    enemiesKilledLastMin++;
-                    enemiesKilledCD[i]--;
-                }
-            }
+            return count;
         }
         private void QuickBuff() { }
         public bool CheckValidInvPotion(int invSlot)
@@ -185,28 +173,29 @@ namespace ElementsAwoken.EASystem
                 return false;
             }
         }
+        public void RecordPotionConsumed()
+        {
+            potionConsumedTimes.Enqueue(updateCount);
+        }
+        public void RecordBossKill()
+        {
+            bossKillTimes.Enqueue(updateCount);
+            ElementsAwoken.DebugModeText("boss killed");
+            ElementsAwoken.DebugModeText("bosses killed last min: " + (bossesKilledLastMin + 1));
+            ElementsAwoken.DebugModeText("bosses killed last five min: " + (bossesKilledLastFiveMin + 1));
+        }
+        public void RecordEnemyKill()
+        {
+            enemyKillTimes.Enqueue(updateCount);
+        }
         public override void PostSellItem(NPC vendor, Item[] shopInventory, Item item)
         {
-            for (int i = 0; i < salesCD.Length; i++)
-            {
-                if (salesCD[i] <= 0)
-                {
-                    salesCD[i] = 3600;
-                    break;
-                }
-            }
+            saleTimes.Enqueue(updateCount);
             ElementsAwoken.DebugModeText("sales last min: " + (salesLastMin + 1));
         }
         public override void PostBuyItem(NPC vendor, Item[] shopInventory, Item item)
         {
-            for (int i = 0; i < buysCD.Length; i++)
-            {
-                if (buysCD[i] <= 0)
-                {
-                    buysCD[i] = 3600;
-                    break;
-                }
-            }
+            buyTimes.Enqueue(updateCount);
             ElementsAwoken.DebugModeText("buys last min: " + (buysLastMin + 1));
         }
     }
@@ -219,14 +208,7 @@ namespace ElementsAwoken.EASystem
 
             if (item.buffType != 0 && item.useStyle == 2 && item.consumable && item.type != ItemID.Ale)
             {
-                for (int i = 0; i < modPlayer.potionConsumedCD.Length; i++)
-                {
-                    if (modPlayer.potionConsumedCD[i] <= 0)
-                    {
-                        modPlayer.potionConsumedCD[i] = 3600;
-                        break;
-                    }
-                }
+                modPlayer.RecordPotionConsumed();
                 ElementsAwoken.DebugModeText("potions consumed last min: " + (modPlayer.potionsConsumedLastMin + 1));
             }
             return base.UseItem(item, player);
@@ -236,31 +218,15 @@ namespace ElementsAwoken.EASystem
     {
         public override void OnKill(NPC npc)
         {
-            Player player = Main.player[Main.myPlayer];
-            PlayerUtils modPlayer = player.GetModPlayer<PlayerUtils>();
-            if (npc.boss)
+            // OnKill only runs in singleplayer or on the server.
+            // Boss kills are recorded for every player by SanityNPC (AwakenedPlayer.SanityEventType.BossKilled).
+            if (!npc.boss && !npc.friendly && !npc.SpawnedFromStatue)
             {
-                for (int i = 0; i < modPlayer.bossKilledCD.Length; i++)
+                // The kill is credited to the player who last hit the NPC.
+                int killer = Main.netMode == NetmodeID.SinglePlayer ? Main.myPlayer : npc.lastInteraction;
+                if (AwakenedPlayer.IsValidPlayer(killer))
                 {
-                    if (modPlayer.bossKilledCD[i] <= 0)
-                    {
-                        modPlayer.bossKilledCD[i] = 18000;
-                        break;
-                    }
-                }
-                ElementsAwoken.DebugModeText("boss killed");
-                ElementsAwoken.DebugModeText("bosses killed last min: " + (modPlayer.bossesKilledLastMin + 1));
-                ElementsAwoken.DebugModeText("bosses killed last five min: " + (modPlayer.bossesKilledLastFiveMin + 1));
-            }
-            else if (!npc.friendly && !npc.SpawnedFromStatue)
-            {
-                for (int i = 0; i < modPlayer.enemiesKilledCD.Length; i++)
-                {
-                    if (modPlayer.enemiesKilledCD[i] <= 0)
-                    {
-                        modPlayer.enemiesKilledCD[i] = 3600;
-                        break;
-                    }
+                    AwakenedPlayer.SendSanityEvent(AwakenedPlayer.SanityEventType.EnemyKilled, killer);
                 }
             }
         }

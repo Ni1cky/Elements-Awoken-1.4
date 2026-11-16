@@ -169,7 +169,7 @@ namespace ElementsAwoken.Content.Items.InfinityGauntlet
                         NetMessage.SendData(65, -1, -1, null, 0, player.whoAmI, targetPos.X, targetPos.Y, 1, 0, 0);
                     }
 
-                    if (!ModContent.GetInstance<Config>().debugMode)
+                    if (!ModContent.GetInstance<ServerConfig>().debugMode)
                     {
                         player.AddBuff(ModContent.BuffType<InfinityPortalCooldown>(), 1800);
                     }
@@ -369,7 +369,7 @@ namespace ElementsAwoken.Content.Items.InfinityGauntlet
                                 }
                             }
                         }
-                        if (!ModContent.GetInstance<Config>().debugMode)
+                        if (!ModContent.GetInstance<ServerConfig>().debugMode)
                         {
                             player.AddBuff(ModContent.BuffType<InfinityBubbleCooldown>(), 1200);
                         }
@@ -421,7 +421,7 @@ namespace ElementsAwoken.Content.Items.InfinityGauntlet
                                 }
                             }
                         }
-                        if (!ModContent.GetInstance<Config>().debugMode)
+                        if (!ModContent.GetInstance<ServerConfig>().debugMode)
                         {
                             player.AddBuff(ModContent.BuffType<InfinityVoidCooldown>(), 2700);//2700
                         }

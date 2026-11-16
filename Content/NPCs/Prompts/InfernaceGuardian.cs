@@ -179,7 +179,7 @@ namespace ElementsAwoken.Content.NPCs.Prompts
                         foundNewLoc = true;
                         break;
                     }
-                    if (ModContent.GetInstance<Config>().debugMode)
+                    if (ModContent.GetInstance<ServerConfig>().debugMode)
                     {
                         for (int i = 0; i < 20; i++)
                         {

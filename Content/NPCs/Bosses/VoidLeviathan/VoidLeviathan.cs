@@ -962,7 +962,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.VoidLeviathan
         }
         private void Wander(Player P)
         {
-            if (ModContent.GetInstance<Config>().debugMode)
+            if (ModContent.GetInstance<ServerConfig>().debugMode)
             {
                 int dust = Dust.NewDust(new Vector2(wanderX, wanderY), 16, 16, DustID.Firework_Pink);
                 Main.dust[dust].noGravity = true;
@@ -985,7 +985,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.VoidLeviathan
         }
         private void Circle(Player P)
         {
-            if (ModContent.GetInstance<Config>().debugMode)
+            if (ModContent.GetInstance<ServerConfig>().debugMode)
             {
                 int dust = Dust.NewDust(new Vector2(wanderX, wanderY), 16, 16, DustID.Firework_Pink);
                 Main.dust[dust].noGravity = true;

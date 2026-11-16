@@ -108,7 +108,7 @@ namespace ElementsAwoken.Content.Events.VoidEvent.Enemies.Phase1
                 }
                 Vector2 targetLoc = new Vector2(vectorX, vectorY);
                 Move(P, 0.015f, targetLoc);
-                if (ModContent.GetInstance<Config>().debugMode)
+                if (ModContent.GetInstance<ServerConfig>().debugMode)
                 {
                     Dust dust = Main.dust[Dust.NewDust(targetLoc, 2, 2, 6)];
                     dust.noGravity = true;

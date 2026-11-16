@@ -147,7 +147,7 @@ namespace ElementsAwoken.Content.Events.VoidEvent.Enemies.Phase1
                         foundNewLoc = true;
                         break;
                     }
-                    if (ModContent.GetInstance<Config>().debugMode)
+                    if (ModContent.GetInstance<ServerConfig>().debugMode)
                     {
                         for (int i = 0; i < 20; i++)
                         {

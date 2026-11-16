@@ -254,8 +254,8 @@ namespace ElementsAwoken.EASystem.EAPlayer
         }
         public static StatModifier ReducePierceDamage(StatModifier damage, Projectile projectile)
         {
-            if (projectile.type == ProjectileID.LastPrismLaser && ModContent.GetInstance<Config>().vItemChangesDisabled) return (damage * 0.1f);
-            else if (projectile.type == ProjectileID.LastPrismLaser && !ModContent.GetInstance<Config>().vItemChangesDisabled) return (damage * 0.85f);
+            if (projectile.type == ProjectileID.LastPrismLaser && ModContent.GetInstance<ServerConfig>().vItemChangesDisabled) return (damage * 0.1f);
+            else if (projectile.type == ProjectileID.LastPrismLaser && !ModContent.GetInstance<ServerConfig>().vItemChangesDisabled) return (damage * 0.85f);
             else if (projectile.maxPenetrate == -1 && ProjectileID.Sets.YoyosMaximumRange[projectile.type] == 0) return (damage * 0.5f);
             else if (projectile.maxPenetrate > 10) return (damage * 0.5f);
             else if (projectile.maxPenetrate > 6) return (damage * 0.75f);

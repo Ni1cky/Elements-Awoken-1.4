@@ -15,7 +15,7 @@ namespace ElementsAwoken.EASystem.UI.Tooltips
 
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
-            if(ModContent.GetInstance<Config>().debugMode == false) return;
+            if(ModContent.GetInstance<ServerConfig>().debugMode == false) return;
             if (!_dropTooltipCache.TryGetValue(item.type, out var cachedLines))
             {
                 cachedLines = [];

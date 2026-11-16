@@ -57,7 +57,7 @@ namespace ElementsAwoken.Content.Projectiles.Minions
         }
         public override void PostDraw(Color lightColor)
         {
-            if (ModContent.GetInstance<Config>().debugMode)
+            if (ModContent.GetInstance<ServerConfig>().debugMode)
             {
                 EAU.Sb.DrawString(FontAssets.MouseText.Value, "ai[0]: " + Projectile.ai[0], Projectile.Hitbox.TopLeft() + new Vector2(0, -10), Color.White);
             }
@@ -182,7 +182,7 @@ namespace ElementsAwoken.Content.Projectiles.Minions
                         {
                             Projectile.ai[1] = 180f;
                         }
-                        if (ModContent.GetInstance<Config>().debugMode)
+                        if (ModContent.GetInstance<ServerConfig>().debugMode)
                         {
                             for (int i = 0; i < 8; i++)
                             {

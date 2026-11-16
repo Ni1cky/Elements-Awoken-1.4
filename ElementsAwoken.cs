@@ -16,7 +16,6 @@ using ElementsAwoken.EASystem.UI;
 using ElementsAwoken.EAUtilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoMod.Cil;
 using Newtonsoft.Json;
 using ReLogic.Content;
 using ReLogic.Graphics;
@@ -152,8 +151,6 @@ namespace ElementsAwoken
         }
         public override void Load()
         {
-            Terraria.IL_Player.Update += RemoveManaCap;
-
             DateTime now = DateTime.Today;
             if (now.Day == 1 && now.Month == 4) aprilFools = true;
 
@@ -376,7 +373,7 @@ namespace ElementsAwoken
         public static void DebugModeText(object text, int r = 255, int g = 255, int b = 255)
         {
             Color color = new Color(r, g, b);
-            if (ModContent.GetInstance<Config>().debugMode)
+            if (ModContent.GetInstance<ServerConfig>().debugMode)
             {
                 Main.NewText(text, color);
             }
@@ -384,7 +381,7 @@ namespace ElementsAwoken
         public static void DebugModeNetworkText(string text, int r = 255, int g = 255, int b = 255)
         {
             Color color = new Color(r, g, b);
-            if (ModContent.GetInstance<Config>().debugMode)
+            if (ModContent.GetInstance<ServerConfig>().debugMode)
             {
                 NetworkText f = NetworkText.FromLiteral(text);
                 ChatHelper.BroadcastChatMessage(f, color);
@@ -393,7 +390,7 @@ namespace ElementsAwoken
         public static void DebugModeCombatText(string text, Rectangle rect, int r = 255, int g = 255, int b = 255)
         {
             Color color = new Color(r, g, b);
-            if (ModContent.GetInstance<Config>().debugMode)
+            if (ModContent.GetInstance<ServerConfig>().debugMode)
             {
                 CombatText.NewText(rect, color, text, true, false);
             }
@@ -1295,20 +1292,6 @@ namespace ElementsAwoken
                 }
             }
         }
-        private void RemoveManaCap(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-
-            if (!cursor.TryGotoNext(MoveType.Before,
-                                    i => i.MatchLdfld("Terraria.Player", "statManaMax2"),
-                                    i => i.MatchLdcI4(400)))
-            {
-                Logger.Fatal("Could not find instruction to patch");
-                return;
-            }
-
-            cursor.Next.Next.Operand = int.MaxValue;
-        }
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             ElementsAwokenMessageType msgType = (ElementsAwokenMessageType)reader.ReadByte();
@@ -1336,6 +1319,13 @@ namespace ElementsAwoken
                     int energy = reader.ReadInt32();
                     energyPlayer.energy = energy;
                     break;
+                case ElementsAwokenMessageType.SanityEvent:
+                    AwakenedPlayer.SanityEventType sanityEvent = (AwakenedPlayer.SanityEventType)reader.ReadByte();
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        AwakenedPlayer.ApplySanityEvent(Main.LocalPlayer, sanityEvent);
+                    }
+                    break;
                 default:
                     Logger.WarnFormat("Elements Awoken: Unknown Message type: {0}", msgType);
                     break;
@@ -1347,6 +1337,7 @@ namespace ElementsAwoken
             AwakenedSync,
             EnergySync,
             Storyteller,
+            SanityEvent,
         }
     }
 }

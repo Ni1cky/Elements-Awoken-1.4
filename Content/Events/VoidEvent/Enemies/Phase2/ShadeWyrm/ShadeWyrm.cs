@@ -744,8 +744,8 @@ namespace ElementsAwoken.Content.Events.VoidEvent.Enemies.Phase2.ShadeWyrm
         }
         public override void ModifyHitByProjectile(Projectile projectile, ref NPC.HitModifiers modifiers)
         {
-            if (projectile.type == ProjectileID.LastPrismLaser && GetInstance<Config>().vItemChangesDisabled) modifiers.SourceDamage = (modifiers.SourceDamage * 0.1f);
-            else if (projectile.type == ProjectileID.LastPrismLaser && !GetInstance<Config>().vItemChangesDisabled) modifiers.SourceDamage = (modifiers.SourceDamage * 0.3f);
+            if (projectile.type == ProjectileID.LastPrismLaser && GetInstance<ServerConfig>().vItemChangesDisabled) modifiers.SourceDamage = (modifiers.SourceDamage * 0.1f);
+            else if (projectile.type == ProjectileID.LastPrismLaser && !GetInstance<ServerConfig>().vItemChangesDisabled) modifiers.SourceDamage = (modifiers.SourceDamage * 0.3f);
             else if (projectile.penetrate == -1 && ProjectileID.Sets.YoyosMaximumRange[projectile.type] == 0) modifiers.SourceDamage = (modifiers.SourceDamage * 0.3f);
             else if (projectile.maxPenetrate > 10) modifiers.SourceDamage = (modifiers.SourceDamage * 0.3f);
             else if (projectile.maxPenetrate > 6) modifiers.SourceDamage = (modifiers.SourceDamage * 0.5f);

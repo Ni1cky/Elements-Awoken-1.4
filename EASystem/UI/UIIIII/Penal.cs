@@ -52,7 +52,7 @@ namespace ElementsAwoken.EASystem.UI.UIIIII
         private void CloseButtonClicked(UIMouseEvent evt, UIElement listeningElement)
         {
             SoundEngine.PlaySound(SoundID.MenuClose);
-            UISystemSettings.Panel = false;
+            Main.LocalPlayer.GetModPlayer<BossPromptInfoPlayer>().seenBossPromptInfo = true;
         }
     }
     public class DraggableUIPanel : UIPanel

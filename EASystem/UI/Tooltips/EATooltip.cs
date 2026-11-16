@@ -77,7 +77,7 @@ namespace ElementsAwoken.EASystem.UI.Tooltips
                     tooltips.Insert(1, tip);
                 }
             }
-            if (ModContent.GetInstance<Config>().debugMode)
+            if (ModContent.GetInstance<ServerConfig>().debugMode)
             {
                 string tipString = "";
                 if (item.useTime > 0) tipString += "Use Time: " + item.useTime + "\n";

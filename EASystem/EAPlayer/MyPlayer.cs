@@ -1890,7 +1890,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 }
             }
             #region PROMPTS!!
-            if (!GetInstance<Config>().promptsDisabled)
+            if (!GetInstance<ServerConfig>().promptsDisabled)
             {
                 bool activeBoss = false;
                 bool inTown = false;
@@ -3217,7 +3217,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     {
                         if (Player.FindBuffIndex(BuffType<HoneyCocoonCD>()) == -1 && !Player.dead)
                         {
-                            int duration = GetInstance<Config>().debugMode ? 300 : 3600;
+                            int duration = GetInstance<ServerConfig>().debugMode ? 300 : 3600;
                             Player.AddBuff(BuffType<HoneyCocoonCD>(), duration);
                             honeyCocooned = 900;
                         }
@@ -3258,7 +3258,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 }
                 if (hasEnergy)
                 {
-                    int duration = GetInstance<Config>().debugMode ? 420 : 2700;
+                    int duration = GetInstance<ServerConfig>().debugMode ? 420 : 2700;
                     Player.AddBuff(BuffType<BoostDriveCD>(), duration);
                     boostDriveTimer = 300;
 
@@ -3467,7 +3467,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
             if (crystallineLocket && ElementsAwoken.specialAbility.JustPressed && Player.FindBuffIndex(BuffType<CrystallineLocketCD>()) == -1)
             {
                 crystallineLocketCrit = 600;
-                if (!GetInstance<Config>().debugMode) Player.AddBuff(BuffType<CrystallineLocketCD>(), 3600);
+                if (!GetInstance<ServerConfig>().debugMode) Player.AddBuff(BuffType<CrystallineLocketCD>(), 3600);
                 else Player.AddBuff(BuffType<CrystallineLocketCD>(), 60);
 
             }
@@ -3498,7 +3498,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
             if (greatLens && Player.FindBuffIndex(BuffType<GreatLensCD>()) == -1 && ElementsAwoken.specialAbility.JustPressed)
             {
                 greatLensTimer = 600;
-                if (!GetInstance<Config>().debugMode) Player.AddBuff(BuffType<GreatLensCD>(), 3600);
+                if (!GetInstance<ServerConfig>().debugMode) Player.AddBuff(BuffType<GreatLensCD>(), 3600);
                 else Player.AddBuff(BuffType<GreatLensCD>(), 60);
             }
             if (ElementsAwoken.armorAbility.JustPressed && voidWalkerCooldown <= 0 && voidWalkerArmor > 0)

@@ -24,10 +24,6 @@ namespace ElementsAwoken.EASystem.EARecipeSystem
             }
             foreach (var recipe in Main.recipe.ToList())
             {
-                if (recipe.createItem.type == ItemID.TerrasparkBoots)
-                {
-                    recipe.DisableRecipe();
-                }
                 if (recipe.createItem.type == ItemID.CellPhone)
                 {
                     recipe.AddIngredient(ModContent.ItemType<AlchemistsTimer>());
@@ -35,6 +31,7 @@ namespace ElementsAwoken.EASystem.EARecipeSystem
                     recipe.AddIngredient(ModContent.ItemType<RainMeter>());
                 }
             }
+            // Alternative recipe; the vanilla Terraspark Boots recipe stays available.
             Recipe srecipe = Recipe.Create(ItemID.TerrasparkBoots);
             srecipe.AddIngredient(ModContent.ItemType<DesertTrailers>());
             srecipe.AddIngredient(ItemID.LavaCharm);
