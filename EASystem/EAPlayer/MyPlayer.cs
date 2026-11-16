@@ -2912,7 +2912,6 @@ namespace ElementsAwoken.EASystem.EAPlayer
         public override void ModifyHurt(ref Player.HurtModifiers modifiers)
         {
             var source = Main.LocalPlayer.GetSource_FromThis();
-            float damage = modifiers.SourceDamage.Base;
             if (wispForm)
             {
                 modifiers.DisableSound();
@@ -2926,34 +2925,39 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 }
             }
 
-            damage = (int)(damage * damageTaken);
+            modifiers.SourceDamage *= damageTaken;
 
-            if (honeyCocooned> 0)
+            if (modifiers.DamageSource.SourceOtherIndex == 0) // fall damage
             {
-                if (!Player.immune)
+                if (puffFall) modifiers.SourceDamage *= 0.5f;
+                if (arid) modifiers.SourceDamage *= MathHelper.Clamp(aridFalling, 0, Player.maxFallSpeed) / Player.maxFallSpeed;
+                if (gelticConqueror && !Player.controlDown) modifiers.SourceDamage *= 0.25f;
+            }
+            if (modifiers.DamageSource.SourceOtherIndex == 3) // spikes and other tiles that hurt on touch
+            {
+                if (templeSpikeBoots)
                 {
-                    honeyCocoonDamage += (int)damage;
-                    CombatText.NewText(Player.getRect(), Color.Orange, honeyCocoonDamage);
-                    if (honeyCocoonDamage >= 100)
-                    {
-                        honeyCocooned = 0;
-                        SoundEngine.PlaySound(SoundID.NPCDeath1, Player.position);
-
-                        Vector2 pos = Player.Center;
-                        int numDusts = 36;
-                        for (int i = 0; i < numDusts; i++)
-                        {
-                            Vector2 position = Vector2.One.RotatedBy((double)((float)(i - (numDusts / 2 - 1)) * 6.28318548f / (float)numDusts), default(Vector2)) + pos;
-                            Vector2 velocity = position - pos;
-                            Vector2 spawnPos = position + velocity;
-                            Dust dust = Main.dust[Dust.NewDust(spawnPos, 0, 0, 153, velocity.X * 2f, velocity.Y * 2f, 100, default(Color), 1f)];
-                            dust.noGravity = true;
-                            dust.noLight = true;
-                            dust.velocity = Vector2.Normalize(velocity) * 6f * Main.rand.NextFloat(0.8f, 1.2f);
-                        }
-                    }
-                    SoundEngine.PlaySound(SoundID.NPCHit1.WithPitchOffset(-0.2f), Player.position);
+                    modifiers.Cancel();
+                    return;
                 }
+                if (spikeBoots)
+                {
+                    modifiers.ModifyHurtInfo += (ref Player.HurtInfo info) =>
+                    {
+                        if (info.SourceDamage <= 46) info.Cancelled = true;
+                    };
+                }
+            }
+
+            if (honeyCocooned > 0)
+            {
+                // the cocoon takes the hit instead of the player and breaks once it has absorbed 100 damage
+                bool absorb = !Player.immune;
+                modifiers.ModifyHurtInfo += (ref Player.HurtInfo info) =>
+                {
+                    if (absorb && !info.Cancelled) AbsorbHitWithHoneyCocoon(info.SourceDamage);
+                    info.Cancelled = true;
+                };
                 Player.immuneTime = 30;
                 Player.immune = true;
                 return;
@@ -2986,48 +2990,42 @@ namespace ElementsAwoken.EASystem.EAPlayer
             }
             if (Player.FindBuffIndex(BuffType<ChaosShield>()) != -1 && !Player.dead)
             {
-                chaosBoost += damage;
-                damage /= 5;
-            }
-            if (oceanicArmor)
-            {
-                if (damage > 25)
-                {
-                    for (int i = 0; i < 5; i++)
-                    {
-                        float speed = Main.rand.Next(-6, 6);
-                        Projectile.NewProjectile(source, Player.Center.X, Player.Center.Y, speed, speed, ProjectileType<PoisonWater>(), 60, 1.25f, Main.myPlayer, 0f, 0f);
-                    }
-                }
+                modifiers.SourceDamage /= 5; // the blocked damage is stored as a damage boost in OnHurt
             }
             if (viridiumDash)
             {
                 explosionEffect(Player, ProjectileType<Explosion>(), 1000, 10f, 21);
+                modifiers.Cancel();
                 return;
             }
             if (aegisDashTimer > 0)
             {
-                damage = (int)(damage * 0.1f);
+                modifiers.SourceDamage *= 0.1f;
             }
             if (voidEnergyTimer > 0)
             {
-                damage = (int)(damage * 0.5f);
+                modifiers.SourceDamage *= 0.5f;
             }
             if (flingToShackle)
             {
+                modifiers.Cancel();
                 return;
             }
             if (icyHeart)
             {
-                damage = (int)(damage * icyHeartDR);
                 icyHeartTimer = -600;
-                if (damage == 0) return;
+                if (icyHeartDR <= 0f)
+                {
+                    modifiers.Cancel();
+                    return;
+                }
+                modifiers.SourceDamage *= icyHeartDR;
             }
             if (starstruck)
             {
-                damage = (int)(damage * MathHelper.Lerp(1, 4, (float)starstruckCounter / 20));
+                modifiers.SourceDamage *= MathHelper.Lerp(1, 4, (float)starstruckCounter / 20);
             }
-            if (hellFury) damage *= 2;
+            if (hellFury) modifiers.SourceDamage *= 2f;
             if (glassHeart)
             {
                 modifiers.DisableSound();
@@ -3037,24 +3035,37 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 return;
 
             }
-            return;
+        }
+        private void AbsorbHitWithHoneyCocoon(int damage)
+        {
+            honeyCocoonDamage += damage;
+            CombatText.NewText(Player.getRect(), Color.Orange, honeyCocoonDamage);
+            if (honeyCocoonDamage >= 100)
+            {
+                honeyCocooned = 0;
+                SoundEngine.PlaySound(SoundID.NPCDeath1, Player.position);
+
+                Vector2 pos = Player.Center;
+                int numDusts = 36;
+                for (int i = 0; i < numDusts; i++)
+                {
+                    Vector2 position = Vector2.One.RotatedBy((double)((float)(i - (numDusts / 2 - 1)) * 6.28318548f / (float)numDusts), default(Vector2)) + pos;
+                    Vector2 velocity = position - pos;
+                    Vector2 spawnPos = position + velocity;
+                    Dust dust = Main.dust[Dust.NewDust(spawnPos, 0, 0, 153, velocity.X * 2f, velocity.Y * 2f, 100, default(Color), 1f)];
+                    dust.noGravity = true;
+                    dust.noLight = true;
+                    dust.velocity = Vector2.Normalize(velocity) * 6f * Main.rand.NextFloat(0.8f, 1.2f);
+                }
+            }
+            SoundEngine.PlaySound(SoundID.NPCHit1.WithPitchOffset(-0.2f), Player.position);
         }
         public override void OnHurt(Player.HurtInfo info)
         {
             var source = Main.LocalPlayer.GetSource_FromThis();
-            float damage = info.Damage;
-
-            if (puffFall)
-            {
-                if (info.DamageSource.SourceOtherIndex == 0)
-                {
-                    damage /= 2f;
-                    info.Damage = (int)damage; 
-                }
-            }
             if (lightningCloud && lightningCloudCharge > 60)
             {
-                if (damage > 0 && info.DamageSource.SourceOtherIndex != 0)
+                if (info.Damage > 0 && info.DamageSource.SourceOtherIndex != 0)
                 {
                     SoundEngine.PlaySound(SoundID.Item93, Player.position);
 
@@ -3087,26 +3098,23 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     lightningCloudCharge = 0;
                 }
             }
-            if (puffFall)
+            // OnHurt also runs for other players' copies when their hits are synced, so these only run for the local player
+            if (Player.whoAmI == Main.myPlayer)
             {
-                if (info.DamageSource.SourceOtherIndex == 0)
+                if (Player.FindBuffIndex(BuffType<ChaosShield>()) != -1 && !Player.dead)
                 {
-                    damage /= 2;
+                    // the shield cut this hit to a fifth in ModifyHurt; the full damage is stored as a damage boost
+                    chaosBoost += info.SourceDamage * 5;
+                }
+                if (oceanicArmor && info.SourceDamage > 25)
+                {
+                    for (int i = 0; i < 5; i++)
+                    {
+                        float speed = Main.rand.Next(-6, 6);
+                        Projectile.NewProjectile(source, Player.Center.X, Player.Center.Y, speed, speed, ProjectileType<PoisonWater>(), 60, 1.25f, Main.myPlayer, 0f, 0f);
+                    }
                 }
             }
-            if (arid && info.DamageSource.SourceOtherIndex == 0)
-            {
-                damage = (int)(damage * (MathHelper.Clamp(aridFalling, 0, Player.maxFallSpeed) / Player.maxFallSpeed));
-            }
-            if (gelticConqueror)
-            {
-                if (info.DamageSource.SourceOtherIndex == 0 && !Player.controlDown)
-                {
-                    damage = (int)(damage * 0.25);
-                }
-            }
-            if (spikeBoots && info.DamageSource.SourceOtherIndex == 3 && damage <= 46) return;
-            if (templeSpikeBoots && info.DamageSource.SourceOtherIndex == 3) return;
         }
         public override bool CanConsumeAmmo(Item weapon, Item ammo)
         {
