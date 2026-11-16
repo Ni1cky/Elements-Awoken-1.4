@@ -1798,6 +1798,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 {
                     playerStartPos = Player.Center;
                     startTime = (int)Main.time;
+                    startDayTime = Main.dayTime; // was never set, so the credits always ended at night
                     screenTransition = true;
                 }
                 if (MyWorld.creditsCounter == screenTransDuration / 2)
@@ -1821,10 +1822,12 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 if (MyWorld.creditsCounter >= screenDuration && MyWorld.creditsCounter < creditsLength)
                 {
                     int screenNum = pointsNotFound + (int)Math.Floor((decimal)(MyWorld.creditsCounter / screenDuration));
-                    if (creditPoints[screenNum].X == 0)
+                    // skip every point that wasn't found in this world; past the last point the camera stays where it is
+                    // (indexing without the bounds check threw every tick once enough points were missing)
+                    while (screenNum < creditPoints.Length && creditPoints[screenNum].X == 0)
                     {
                         pointsNotFound++;
-                        screenNum = pointsNotFound + (int)Math.Floor((decimal)(MyWorld.creditsCounter / screenDuration));
+                        screenNum++;
                     }
                     Vector2 scroll = new Vector2(1, -1);
                     if (screenNum == 1) scroll = new Vector2(0, -1);
@@ -1842,7 +1845,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     else if (screenNum == 13) scroll = new Vector2(1, -0.25f);
                     else if (screenNum == 14) scroll = new Vector2(2, 1);
                     else if (screenNum == 15) scroll = new Vector2(0.2f, 1);
-                    CreditsScroll(screenNum, scroll, screenDuration);
+                    if (screenNum < creditPoints.Length) CreditsScroll(screenNum, scroll, screenDuration);
                 }
 
                 Keys[] pressedKeys = Main.keyState.GetPressedKeys();
@@ -1878,6 +1881,9 @@ namespace ElementsAwoken.EASystem.EAPlayer
             {
                 MyWorld.creditsCounter = 0;
                 escHeldTimer = 0;
+                // the points are searched again the next time the credits play, they may be in another world by then
+                pointsNotFound = 0;
+                Array.Clear(creditPoints);
             }
             if (screenTransition)
             {
