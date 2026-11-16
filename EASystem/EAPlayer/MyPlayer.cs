@@ -3123,6 +3123,8 @@ namespace ElementsAwoken.EASystem.EAPlayer
         }
         public override void PostHurt(Player.HurtInfo info)
         {
+            // PostHurt also runs for other players' copies when their hits are synced, so only the local player spawns projectiles here
+            bool localPlayer = Player.whoAmI == Main.myPlayer;
             if (vleviAegis)
             {
                 vleviAegisDamage += (int)info.Damage;
@@ -3134,7 +3136,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     abyssalRage = 600;
                 }
             }
-            if (toyArmor && toyArmorCooldown <= 0)
+            if (toyArmor && toyArmorCooldown <= 0 && localPlayer)
             {
                 for (int i = 0; i < Main.rand.Next(1, 4); i++)
                 {
@@ -3146,7 +3148,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
             {
                 voidWalkerRegen = 180;
             }
-            if (voidBlood)
+            if (voidBlood && localPlayer)
             {
                 int bloodDamage = 10;
                 if (NPC.downedBoss1) bloodDamage = 15;
@@ -3160,7 +3162,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     Projectile proj = Main.projectile[Projectile.NewProjectile(EAU.Play(Player), Player.Center.X, Player.Center.Y, Main.rand.NextFloat(-3f, 3f), Main.rand.NextFloat(-3f, 3f), Mod.Find<ModProjectile>("VoidBlood").Type, bloodDamage, 0f, Main.myPlayer, 0f, 0f)];
                 }
             }
-            if (slimeBooster)
+            if (slimeBooster && localPlayer)
             {
                 for (int i = 0; i < 7; i++)
                 {
