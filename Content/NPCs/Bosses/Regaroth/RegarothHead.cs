@@ -105,10 +105,10 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Regaroth
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<RegarothMask>(), 10));
 
             _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ModContent.ItemType<RegarothBag>(), 1));
-            _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<SkyEssence>(), minimumDropped: 5, maximumDropped: 25));
 
             npcLoot.Add(_DropNormal);
             npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<SkyEssence>(), 1, 5, 25));
 
             var DropArmor = new LeadingConditionRule(new EAIDRC.DropArmor());
             DropArmor.OnSuccess(ItemDropRule.Common(ModContent.ItemType<EnergyWeaversHelm>()));

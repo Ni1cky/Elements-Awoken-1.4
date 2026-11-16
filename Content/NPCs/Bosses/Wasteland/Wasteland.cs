@@ -231,10 +231,10 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Wasteland
             _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ItemType<WastelandBag>()));
             _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<WastelandTrophy>(), 10));
             _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<WastelandMask>(), 10));
-            _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<DesertEssence>(), minimumDropped: 5, maximumDropped: 20));
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ItemType<WastelandRelicItem>(), 1));
             npcLoot.Add(_DropNormal);
             npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.Common(ItemType<DesertEssence>(), 1, 5, 20));
 
             _AwakenedMode.OnSuccess(ItemDropRule.Common(ItemType<TheAntidote>()));
             npcLoot.Add(_AwakenedMode);
