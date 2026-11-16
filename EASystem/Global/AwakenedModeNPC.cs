@@ -1,9 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.IO;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace ElementsAwoken.EASystem.EAPlayer
 {
@@ -41,7 +44,8 @@ namespace ElementsAwoken.EASystem.EAPlayer
         }
         public override bool PreAI(NPC npc)
         {
-            if (MyWorld.awakenedMode && !hasAssignedElite)
+            // Elite status is rolled only by the server (or in singleplayer) and synced to clients in SendExtraAI/ReceiveExtraAI.
+            if (MyWorld.awakenedMode && !hasAssignedElite && Main.netMode != NetmodeID.MultiplayerClient)
             {
                 hasAssignedElite = true;
                 if (NPC.CountNPCS(npc.type) > 5 && !cantElite && !npc.friendly && npc.damage != 0 && !npc.townNPC && npc.realLife == -1 && !npc.boss)
@@ -65,9 +69,47 @@ namespace ElementsAwoken.EASystem.EAPlayer
                         }
                     }
                 }
+                if (elite > 0)
+                {
+                    ApplyEliteStats(npc, keepFullHealth: false);
+                    npc.netUpdate = true;
+                }
                 ChangeName(npc);
             }
             return base.PreAI(npc);
+        }
+        // Elites have 50% more max life. Applied when the elite status is assigned, because
+        // ApplyDifficultyAndPlayerScaling runs on spawn, before the elite status is rolled in PreAI.
+        private static void ApplyEliteStats(NPC npc, bool keepFullHealth)
+        {
+            bool wasFullHealth = npc.life >= npc.lifeMax;
+            float lifeRatio = npc.lifeMax > 0 ? (float)npc.life / npc.lifeMax : 1f;
+            npc.lifeMax = (int)(npc.lifeMax * 1.5f);
+            if (keepFullHealth)
+            {
+                // Client: current life comes from the server; only fix it up if it was clamped to the old max.
+                if (wasFullHealth)
+                    npc.life = npc.lifeMax;
+            }
+            else
+            {
+                npc.life = Math.Max(1, (int)(npc.lifeMax * lifeRatio));
+            }
+        }
+        public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter binaryWriter)
+        {
+            binaryWriter.Write((byte)elite);
+        }
+        public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader binaryReader)
+        {
+            int receivedElite = binaryReader.ReadByte();
+            if (receivedElite > 0 && elite == 0)
+            {
+                elite = receivedElite;
+                hasAssignedElite = true;
+                ApplyEliteStats(npc, keepFullHealth: true);
+                ChangeName(npc);
+            }
         }
         public virtual void Sync(ModPacket modPacket)
         {
@@ -137,34 +179,13 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 }
             }
         }
-        public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
+        // Elite type 4 (shield): takes 50% less damage while above half health.
+        // Damage must be reduced in ModifyIncomingHit; OnHitBy* hooks run after the damage has already been applied.
+        public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
         {
-            if (elite == 4)
+            if (elite == 4 && npc.life > npc.lifeMax / 2)
             {
-                if (npc.life > npc.lifeMax / 2)
-                {
-                    hit.Damage = (int)(hit.Damage * 0.5f);
-                }
-            }
-        }
-        public override void OnHitNPC(NPC npc, NPC target, NPC.HitInfo hit)
-        {
-            if (elite == 4)
-            {
-                if (npc.life > npc.lifeMax / 2)
-                {
-                    hit.Damage = (int)(hit.Damage * 0.5f);
-                }
-            }
-        }
-        public override void OnHitByItem(NPC npc, Player player, Item item, NPC.HitInfo hit, int damageDone)
-        {
-            if (elite == 4)
-            {
-                if (npc.life > npc.lifeMax / 2)
-                {
-                    hit.Damage = (int)(hit.Damage * 0.5f);
-                }
+                modifiers.FinalDamage *= 0.5f;
             }
         }
         public override void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
@@ -233,10 +254,6 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 {
                     npc.value *= 1.5f;
                     ScaleBossStats(npc);
-                }
-                if (elite > 0)
-                {
-                    npc.lifeMax = (int)(npc.lifeMax * 1.5f);
                 }
             }
         }
