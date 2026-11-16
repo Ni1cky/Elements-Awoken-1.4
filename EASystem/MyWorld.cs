@@ -622,7 +622,7 @@ namespace ElementsAwoken
                     VoidEvent.StartInvasion();
                     Main.invasionX = Main.spawnTileX;
                     voidInvasionWillStart = false;
-                    Filters.Scene.Deactivate("MoonLordShake", new object[0]);
+                    if (!Main.dedServ) Filters.Scene.Deactivate("MoonLordShake", new object[0]);
                 }
                 float intensity = MathHelper.Clamp((float)Main.time / 54000f, 0f, 1f);
                 MoonlordShake(intensity);
@@ -877,6 +877,7 @@ namespace ElementsAwoken
         }
         private void MoonlordShake(float intensity)
         {
+            if (Main.dedServ) return; // screen shaders don't exist on servers
             if (Main.netMode == NetmodeID.SinglePlayer)
             {
                 Player player = Main.LocalPlayer;

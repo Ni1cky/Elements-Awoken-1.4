@@ -28,6 +28,8 @@ namespace ElementsAwoken.Content.Projectiles.NPCProj.Ancients.Gores
         }
         public override void AI()
         {
+            // only a visual effect and a push for the local player; screen shaders don't exist on servers
+            if (Main.dedServ) return;
             Projectile.ai[0] += 8;
             Player player = Main.player[Main.myPlayer];
             if (!hasPushed[player.whoAmI] && Vector2.Distance(player.Center, Projectile.Center) < Projectile.ai[0])
@@ -55,7 +57,7 @@ namespace ElementsAwoken.Content.Projectiles.NPCProj.Ancients.Gores
         }
         public override void OnKill(int timeLeft)
         {
-            Filters.Scene["Shockwave"].Deactivate();
+            if (!Main.dedServ) Filters.Scene["Shockwave"].Deactivate();
         }
     }
 }

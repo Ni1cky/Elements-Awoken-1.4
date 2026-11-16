@@ -158,7 +158,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Permafrost
             }
             MyWorld.downedPermafrost = true;
             if (Main.netMode == NetmodeID.Server) NetMessage.SendData(MessageID.WorldData);
-            Terraria.Graphics.Effects.Filters.Scene["Shockwave"].Deactivate();
+            if (!Main.dedServ) Terraria.Graphics.Effects.Filters.Scene["Shockwave"].Deactivate(); // screen shaders don't exist on servers
         }
         public override void BossLoot(ref int potionType)
         {
