@@ -43,6 +43,8 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Regaroth
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[NPC.type] = 2;
+            // not shown in the bestiary: segment of Regaroth, which has its own entry
+            NPCID.Sets.NPCBestiaryDrawOffset[Type] = new NPCID.Sets.NPCBestiaryDrawModifiers() { Hide = true };
         }
         public override void FindFrame(int frameHeight)
         {

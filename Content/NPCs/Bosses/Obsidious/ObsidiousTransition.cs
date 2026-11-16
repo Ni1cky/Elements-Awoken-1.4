@@ -1,6 +1,7 @@
 ﻿using ElementsAwoken.EAUtilities;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace ElementsAwoken.Content.NPCs.Bosses.Obsidious
@@ -27,6 +28,8 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Obsidious
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[NPC.type] = 16;
+            // not shown in the bestiary: only the transformation visual of Obsidious
+            NPCID.Sets.NPCBestiaryDrawOffset[Type] = new NPCID.Sets.NPCBestiaryDrawModifiers() { Hide = true };
         }
         public override void FindFrame(int frameHeight)
         {

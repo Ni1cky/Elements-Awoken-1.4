@@ -31,6 +31,8 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Wasteland
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[NPC.type] = 5;
+            // not shown in the bestiary: only the burrowing visual of Wasteland
+            NPCID.Sets.NPCBestiaryDrawOffset[Type] = new NPCID.Sets.NPCBestiaryDrawModifiers() { Hide = true };
         }
         public override bool CheckActive()
         {
