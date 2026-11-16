@@ -13,11 +13,13 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
 using Terraria;
+using Terraria.Chat;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using static ElementsAwoken.EASystem.Biome.EABiomes;
 using static Terraria.ModLoader.ModContent;
@@ -108,7 +110,9 @@ namespace ElementsAwoken.Content.NPCs.Bosses.VoidLeviathan
                 ElementsAwoken.encounter = 3;
                 ElementsAwoken.encounterTimer = 3600;
                 ElementsAwoken.DebugModeText("encounter 3 start");
-                Main.NewText(GetInstance<EALocalization>().VoidLeviathanHead, new Color(235, 70, 106));
+                // OnKill only runs on the server in multiplayer, so the message has to be broadcast
+                if (Main.netMode == NetmodeID.Server) ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Mods.ElementsAwoken.Said.VoidLeviathanHead"), new Color(235, 70, 106));
+                else Main.NewText(GetInstance<EALocalization>().VoidLeviathanHead, new Color(235, 70, 106));
             }
             if (MyWorld.voidLeviathanKills < 3)
             {

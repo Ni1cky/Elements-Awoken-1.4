@@ -328,6 +328,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
         public int encounterTextAlpha = 0;
         public int encounterTextTimer = 0;
         public bool finalText = false;
+        public int encounterLine = 0; // the last encounter line shown to the local player (0 = none yet)
 
         // screenshake
         public float screenshakeAmount = 0; // dont go above 15 unless you want to have a seizure
@@ -1592,94 +1593,9 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 Player.lifeRegen += 75;
             }
             #region encounters
-            if (ElementsAwoken.encounter != 0)
-            {
-                string Said = this.GetLocalization("Encounter.Said").Value;
-                string Said1 = this.GetLocalization("Encounter.Said1").Value;
-                string Said2 = this.GetLocalization("Encounter.Said2").Value;
-                string Said3 = this.GetLocalization("Encounter.Said3").Value;
-                string Said4 = this.GetLocalization("Encounter.Said4").Value;
-                string Said5 = this.GetLocalization("Encounter.Said5").Value;
-                string Said6 = this.GetLocalization("Encounter.Said6").Value;
-                string Said7 = this.GetLocalization("Encounter.Said7").Value;
-                string Said8 = this.GetLocalization("Encounter.Said8").Value;
-                string Said9 = this.GetLocalization("Encounter.Said9").Value;
-                string Said10 = this.GetLocalization("Encounter.Said10").Value;
-
-                if (ElementsAwoken.encounter == 1)
-                {
-                    screenshakeAmount = 5f;
-                    UISystemSettings.VoidTime++;
-                }
-                if (ElementsAwoken.encounter >= 2)
-                {
-                    if (Player.active && !Player.dead) Player.AddBuff(BuffID.Darkness, 60);
-                    UISystemSettings.VoidSay = true;
-                    UISystemSettings.VoidTime++;
-                }
-                if (UISystemSettings.VoidTime == 400)
-                {
-                    UISystemSettings.VoidTime++;
-                    encounterTextTimer = 300;
-                    encounterTextAlpha = 0;
-                    if (ElementsAwoken.encounter == 1) encounterText = Said;
-                    else if (ElementsAwoken.encounter == 2) encounterText = Said1;
-                    else if (ElementsAwoken.encounter == 3) encounterText = Said2;
-                }
-                else if (UISystemSettings.VoidTime == 800)
-                {
-                    UISystemSettings.VoidTime++;
-                    encounterTextTimer = 300;
-                    encounterTextAlpha = 0;
-                    if (ElementsAwoken.encounter == 1) encounterText = Said3;
-                    else if (ElementsAwoken.encounter == 2) encounterText = Said4;
-                    else if (ElementsAwoken.encounter == 3) encounterText = Said5;
-                }
-                else if (UISystemSettings.VoidTime == 1100)
-                {
-                    UISystemSettings.VoidTime++;
-                    encounterTextTimer = 300;
-                    encounterTextAlpha = 0;
-                    if (ElementsAwoken.encounter == 1) encounterText = Said6;
-                    else if (ElementsAwoken.encounter == 2) encounterText = Said7;
-                    else if (ElementsAwoken.encounter == 3) encounterText = Said8;
-                }
-                else if (UISystemSettings.VoidTime == 1400)
-                {
-                    UISystemSettings.VoidTime++;
-                    if (ElementsAwoken.encounter != 1)
-                    {
-                        encounterTextTimer = 300;
-                        encounterTextAlpha = 0;
-                    }
-                    if (ElementsAwoken.encounter == 2) encounterText = Said9;
-                    else if (ElementsAwoken.encounter == 3)
-                    {
-                        encounterText = Said10;
-                        UISystemSettings.VoidColor = Color.DarkRed;
-                        SoundEngine.PlaySound(SoundID.Zombie105, Player.position);
-                        finalText = true;
-                    }
-                }
-                else if (UISystemSettings.VoidTime == 1700)
-                {
-                    encounterText = "";
-                    screenshakeAmount = 0;
-                    ElementsAwoken.encounterTimer = 0;
-                    ElementsAwoken.encounter = 0;
-                    UISystemSettings.VoidTime = 0;
-                }
-                if (UISystemSettings.VoidTime > 300)
-                {
-                    if (encounterTextAlpha > 255) encounterTextAlpha = 255;
-                    else encounterTextAlpha += (int)Math.Ceiling(255f / 60f);
-                }
-                else
-                {
-                    if (encounterTextAlpha < 0) encounterTextAlpha = 0;
-                    else encounterTextAlpha -= (int)Math.Ceiling(255f / 60f);
-                }
-            }
+            // The encounter itself is shared world state (ElementsAwoken.encounter and encounterTimer, run by AETime and synced
+            // with the world data); only the effects on the local player happen here.
+            if (Player.whoAmI == Main.myPlayer) UpdateEncounterEffects();
             #endregion
 
             ComputerText();
@@ -2243,6 +2159,8 @@ namespace ElementsAwoken.EASystem.EAPlayer
 
             encounterTextAlpha = 0;
             encounterTextTimer = 0;
+            encounterLine = 0;
+            finalText = false;
         }
 
         private bool InstalledPack()
@@ -2411,6 +2329,60 @@ namespace ElementsAwoken.EASystem.EAPlayer
             if (MyWorld.creditsCounter - counterN == screenTransDuration / 2) desiredScPos = creditPoints[screenNum];
             if (MyWorld.creditsCounter - counterN > screenTransDuration / 2) Player.Center = desiredScPos;
             if (MyWorld.creditsCounter - counterN > screenTransDuration / 2 && MyWorld.creditsCounter > counterN && MyWorld.creditsCounter < screenDuration * (screenNum + 1) + screenTransDuration / 2) desiredScPos += scroll;
+        }
+        private void UpdateEncounterEffects()
+        {
+            int encounter = ElementsAwoken.encounter;
+            if (encounter == 0)
+            {
+                encounterLine = 0;
+                encounterTextTimer = 0;
+                finalText = false;
+                return;
+            }
+            if (encounter == 1) screenshakeAmount = 5f;
+            else if (Player.active && !Player.dead) Player.AddBuff(BuffID.Darkness, 60);
+
+            // Lines come at fixed points of the encounter timer (counting down from 3600), as in 1.3. The line is picked by range
+            // instead of an exact tick, so a client whose timer was corrected by a world sync (or who joined mid-encounter) still gets it.
+            int timer = ElementsAwoken.encounterTimer;
+            int line = timer > 3200 ? 0 : timer > 2700 ? 1 : timer > 2200 ? 2 : timer > 1700 ? 3 : 4;
+            if (line != encounterLine)
+            {
+                encounterLine = line;
+                string key = (encounter, line) switch
+                {
+                    (1, 1) => "Said",
+                    (1, 2) => "Said3",
+                    (1, 3) => "Said6",
+                    (2, 1) => "Said1",
+                    (2, 2) => "Said4",
+                    (2, 3) => "Said7",
+                    (2, 4) => "Said9",
+                    (3, 1) => "Said2",
+                    (3, 2) => "Said5",
+                    (3, 3) => "Said8",
+                    (3, 4) => "Said10",
+                    _ => null
+                };
+                if (key != null)
+                {
+                    encounterText = this.GetLocalization("Encounter." + key).Value;
+                    encounterTextTimer = 300;
+                    encounterTextAlpha = 0;
+                    if (encounter == 3 && line == 4)
+                    {
+                        SoundEngine.PlaySound(SoundID.Zombie105, Player.position);
+                        finalText = true;
+                    }
+                }
+            }
+
+            // each line fades in, stays and fades out over 5 seconds
+            if (encounterTextTimer > 0) encounterTextTimer--;
+            if (encounterTextTimer == 0) finalText = false;
+            if (encounterTextTimer > 60) encounterTextAlpha = Math.Min(encounterTextAlpha + (int)Math.Ceiling(255f / 60f), 255);
+            else encounterTextAlpha = Math.Max(encounterTextAlpha - (int)Math.Ceiling(255f / 60f), 0);
         }
         private void ComputerText()
         {

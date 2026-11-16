@@ -112,8 +112,7 @@ namespace ElementsAwoken
         public static bool aprilFools = false;
 
         public static int encounter = 0;
-        public static bool encounterSetup = false;
-        public static int encounterTimer = 0;
+        public static int encounterTimer = 0; // ticks left; encounters are run by AETime and synced in MyWorld.NetSend
         public static int encounterShakeTimer = 0;
 
         public const int bossPromptDelay = 108000;

@@ -148,8 +148,6 @@ namespace ElementsAwoken
             swearingEnemies = false;
             ElementsAwoken.encounter = 0;
             ElementsAwoken.encounterTimer = 0;
-            ElementsAwoken.encounterSetup = false;
-            EASystem.UI.UIIIII.UISystemSettings.VoidTime = 0; // an encounter interrupted by leaving the world must not continue in the next one
             aqueousDrive = false;
             azanaDrive = false;
             celestialDrive = false;
@@ -363,6 +361,9 @@ namespace ElementsAwoken
             writer.Write(voidPrompt);
             writer.Write(moonlordKills);
             writer.Write(voidLeviathanKills);
+            // encounters start in OnKill, which only runs on the server; clients get them here and run them on their own (AETime)
+            writer.Write((byte)ElementsAwoken.encounter);
+            writer.Write((short)ElementsAwoken.encounterTimer);
         }
         public override void NetReceive(BinaryReader reader)
         {
@@ -424,6 +425,8 @@ namespace ElementsAwoken
             voidPrompt = reader.ReadInt32();
             moonlordKills = reader.ReadInt32();
             voidLeviathanKills = reader.ReadInt32();
+            ElementsAwoken.encounter = reader.ReadByte();
+            ElementsAwoken.encounterTimer = reader.ReadInt16();
         }
         public override void Load()
         {
