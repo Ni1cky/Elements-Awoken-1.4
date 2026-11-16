@@ -95,7 +95,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Wasteland
             NPC.aiStyle = -1;
             NPC.damage = 0;
             NPC.defense = 15;
-            NPC.lifeMax = 5000;          
+            NPC.lifeMax = 4300;
             NPC.knockBackResist = 0f;
             NPC.value = Item.buyPrice(0, 5, 0, 0);
             NPC.HitSound = SoundID.NPCHit1;

@@ -46,7 +46,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Aqueous
         {
             NPC.width = 132;
             NPC.height = 184;
-            NPC.lifeMax = 100000;
+            NPC.lifeMax = 75000;
             NPC.damage = 75;
             NPC.defense = 52;
             NPC.knockBackResist = 0f;

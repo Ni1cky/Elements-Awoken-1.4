@@ -79,7 +79,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Infernace
         {
             NPC.width = 120;
             NPC.height = 90;
-            NPC.lifeMax = 12000;
+            NPC.lifeMax = 8500;
             NPC.damage = 25;
             NPC.defense = 20;
             NPC.knockBackResist = 0f;

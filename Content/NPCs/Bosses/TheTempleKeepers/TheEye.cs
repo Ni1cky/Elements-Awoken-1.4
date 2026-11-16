@@ -23,7 +23,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.TheTempleKeepers
         {
             NPC.width = 66;
             NPC.height = 52;
-            NPC.lifeMax = 35000;
+            NPC.lifeMax = 25000;
             NPC.damage = 0;
             NPC.defense = 40;
             NPC.knockBackResist = 0f;

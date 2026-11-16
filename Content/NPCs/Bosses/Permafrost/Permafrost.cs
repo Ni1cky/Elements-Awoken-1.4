@@ -67,7 +67,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Permafrost
         {
             NPC.width = 152;
             NPC.height = 158;
-            NPC.lifeMax = 65000;
+            NPC.lifeMax = 40000;
             NPC.damage = 80;
             NPC.defense = 36;
             NPC.knockBackResist = 0f;
