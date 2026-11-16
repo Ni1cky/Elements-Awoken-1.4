@@ -264,15 +264,6 @@ namespace ElementsAwoken.EASystem.EAPlayer
         }
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {
-            foreach (NPC npc in Main.npc)
-            {
-                if (npc.active && npc.boss)
-                {
-                    spawnRate = 0;
-                    maxSpawns = 0;
-                    break;
-                }
-            }
             if (player.FindBuffIndex(BuffType<CalamityPotionBuff>()) != -1)
             {
                 spawnRate = (int)(spawnRate / 12.5f);
@@ -321,7 +312,17 @@ namespace ElementsAwoken.EASystem.EAPlayer
         }
         public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
         {
-            if (AnyBoss()) pool.Clear();
+            // No regular enemies while one of EA's bosses is alive. 1.3 did this for any boss, which also stopped spawns
+            // during vanilla and other mods' boss fights and events (e.g. Martian Madness while a Martian Saucer is alive).
+            if (AnyEABoss()) pool.Clear();
+        }
+        private bool AnyEABoss()
+        {
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                if (npc.boss && npc.ModNPC?.Mod == Mod) return true;
+            }
+            return false;
         }
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {
