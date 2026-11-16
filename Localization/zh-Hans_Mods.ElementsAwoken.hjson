@@ -5961,8 +5961,8 @@ Items: {
 	}
 
 	Warhorn: {
-		DisplayName: 推开敌人
-		Tooltip: 北欧战号
+		DisplayName: 北欧战号
+		Tooltip: 推开敌人
 	}
 
 	Jupiter: {
@@ -7630,7 +7630,7 @@ NPCs: {
 		DisplayName: 雷加罗斯
 
 		BossChecklistIntegration: {
-			EntryName: 雷霆幼龙
+			EntryName: 雷加罗斯
 			SpawnInfo: 在任何时候于高空使用 [i:ElementsAwoken/RegarothSummon]
 		}
 	}
@@ -8937,6 +8937,7 @@ Bestiary: {
 		Scorpion: 这只本已异常剧毒的沙漠蝎子标本被用于一项实验，目的是将其变成活体武器。在沙漠的沙地中释放一只可能会带来毁灭性的后果……
 		VoidLeviathanOrb: 一个巨大的、奇异的球体，由虚空利维坦利用其巨大的能力创造。莫名其妙的是，仅仅是这样一个球体的存在就使这条蛇对任何物理攻击都刀枪不入……
 		Furosia: 炼狱魔匠的女儿，曾是居住在深处的文明的守护者，这个文明在许多万古之前就被夷为平地
+		InfernaceGuardian: 炼狱魔匠的忠实仆从，徘徊于地狱之中，预言着其主人的归来，并向一切反抗者投掷炼狱法术。
 		RegarothMinion: 由雷加罗斯召唤来协助其战斗的幼年雷蛇。不要被它的体型所迷惑，因为它仍然可能很危险
 		MiniToySlime: 玩具史莱姆的较小版本，从一个较大的史莱姆上分裂出来的。尽管体型较小，它仍然可能很危险
 		Firefly: 燃烧着无法抑制的愤怒，这个形状酷似巨大萤火虫的灵魂将倾其所有，夷平其主人命令它摧毁的任何人或物
@@ -9134,8 +9135,8 @@ Tooltips: {
 	InfinityGauntlet7: 沙漠：降下沙漠碎片雨
 	InfinityGauntlet8: 火焰：发射一个火球
 	InfinityGauntlet9: 天空：传送到地图上已发现的位置
-	InfinityGauntlet10: 水：将投射物变成泡泡
-	InfinityGauntlet11: 冰霜：在玩家周围召唤一个护盾
+	InfinityGauntlet10: 冰霜：在玩家周围召唤一个护盾
+	InfinityGauntlet11: 水：将投射物变成泡泡
 	InfinityGauntlet12: 虚空：杀死所有生命值低于10000的非Boss怪物的一半
 	CreditsSetup: 制作人员名单关闭
 	CreditsSetup1: 制作人员名单开启

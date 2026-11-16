@@ -5923,8 +5923,8 @@ Items: {
 	}
 
 	Warhorn: {
-		DisplayName: Pushes enemies away
-		Tooltip: Nordic War Horn
+		DisplayName: Nordic War Horn
+		Tooltip: Pushes enemies away
 	}
 
 	Jupiter: {
@@ -7592,7 +7592,7 @@ NPCs: {
 		DisplayName: Regaroth
 
 		BossChecklistIntegration: {
-			EntryName: Thunderling
+			EntryName: Regaroth
 			SpawnInfo: Use the [i:ElementsAwoken/RegarothSummon] high in the skies at any time.
 		}
 	}
@@ -8899,6 +8899,7 @@ Bestiary: {
 		Scorpion: This specimen of already unusually venomous desert scorpions was used in an experiment in order to turn it into a living weapon. Unleashing one in the sands of the desert might have detrimental consequences...
 		VoidLeviathanOrb: A giant, bizarre orb, created by the Void Leviathan using its immense abilities. Inexplicably, the mere presence of such orb makes the serpent invulnerable to any physical attacks...
 		Furosia: Daughter of the Infernace, once serving as a guardian of the civilization residing in the Depths, which has been razed to the ground many eons ago.
+		InfernaceGuardian: A devoted servant of the Infernace that haunts the Underworld, foretelling the return of its master and hurling infernal spells at anyone who resists.
 		RegarothMinion: Juvenile thunder serpent summoned by Regaroth to aid it in the battle. Do not be fooled by its sizes, for it can still be dangerous.
 		MiniToySlime: Smaller version of a toy slime, which has broken away from a bigger one. It might still be dangerous despite its smaller size.
 		Firefly: Blazing with unrestrained rage, this spirit with a shape reminiscent of a giant firefly will give it all to raze anyone and anything its master will command it to.
@@ -9096,8 +9097,8 @@ Tooltips: {
 	InfinityGauntlet7: Desert: Rains desert shards
 	InfinityGauntlet8: Fire: Fires a fireball
 	InfinityGauntlet9: Sky: Teleport to a discovered location on the map
-	InfinityGauntlet10: Water: Turns projectiles into bubbles
-	InfinityGauntlet11: Frost: Summons a shield around the player
+	InfinityGauntlet10: Frost: Summons a shield around the player
+	InfinityGauntlet11: Water: Turns projectiles into bubbles
 	InfinityGauntlet12: Void: Kills half of all non boss monsters with under 10000 life
 	CreditsSetup: credits off
 	CreditsSetup1: credits on
