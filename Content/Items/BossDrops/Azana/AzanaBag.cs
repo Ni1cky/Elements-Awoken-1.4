@@ -44,6 +44,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.Azana
             itemLoot.Add(_NewItem3);
             _NewItem4.OnSuccess(ItemDropRule.Common(IDropSettings.AzaItemId4, chanceDenominator: IDropSettings.AzaChanceDenominator4, minimumDropped: IDropSettings.AzaMinimumDropped4, maximumDropped: IDropSettings.AzaMaximumDropped4));
             itemLoot.Add(_NewItem4);
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.Azana.Azana>()));
         }
         public override void RightClick(Player player)
         {

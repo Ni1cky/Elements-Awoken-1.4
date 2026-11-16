@@ -138,31 +138,28 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Azana
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             LeadingConditionRule _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
-            LeadingConditionRule _DropExpert = new LeadingConditionRule(new EAIDRC.DropAwakened());
 
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ModContent.ItemType<AzanaRelicItem>()));
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [.. EAList.AzaLoot]));
-            _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ModContent.ItemType<AzanaBag>(), 1));
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<EntropicCoating>(), 7));
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<AzanaTrophy>(), 10));
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<AzanaMask>(), 10));
             npcLoot.Add(_DropNormal);
-            npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<AzanaBag>()));
         }
         public void SaveLifeForAzana()
         {
-            var p = Main.LocalPlayer;
+            // called from AI on every machine: only the server (or singleplayer) spawns the items
+            if (Main.netMode == NetmodeID.MultiplayerClient) return;
             var ns = EAU.NPCs(NPC);
             int item = Main.rand.Next(6);
             int r7 = Main.rand.Next(1, 8);
             int r10 = Main.rand.Next(1, 11);
             if (Main.expertMode)
             {
-                if (Main.expertMode)
-                {
-                    Item.NewItem(ns, NPC.Hitbox, ModContent.ItemType<AzanaBag>());
-                }
+                // one bag for every player who took part in the fight, like a regular kill
+                NPC.DropItemInstanced(NPC.position, NPC.Size, ModContent.ItemType<AzanaBag>());
             }
             else
             {

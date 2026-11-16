@@ -49,6 +49,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.Ancients
 
             _AwakenedMode.OnSuccess(ItemDropRule.Common(ModContent.ItemType<GiftOfTheArchaic>()));
             itemLoot.Add(_AwakenedMode);
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.Ancients.AncientAmalgam>()));
         }
         public override void RightClick(Player player)
         {

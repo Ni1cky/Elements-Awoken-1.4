@@ -51,6 +51,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.ScourgeFighter
             weaponDrop.OnSuccess(ItemDropRule.Common(ModContent.ItemType<ScourgeFighterRocketLauncher>()));
             weaponDrop.OnSuccess(ItemDropRule.Common(ItemID.RocketI, 1, 50, 150));
             itemLoot.Add(weaponDrop);
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.ScourgeFighter.ScourgeFighter>()));
         }
         public override void RightClick(Player player)
         {

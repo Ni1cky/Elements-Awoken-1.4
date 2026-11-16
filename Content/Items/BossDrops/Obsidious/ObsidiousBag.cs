@@ -47,6 +47,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.Obsidious
             itemLoot.Add(_NewItem3);
             _NewItem4.OnSuccess(ItemDropRule.Common(IDropSettings.ObsiItemId4, chanceDenominator: IDropSettings.ObsiChanceDenominator4, minimumDropped: IDropSettings.ObsiMinimumDropped4, maximumDropped: IDropSettings.ObsiMaximumDropped4));
             itemLoot.Add(_NewItem4);
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.Obsidious.Obsidious>()));
         }
         public override void RightClick(Player player)
         {

@@ -85,7 +85,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.VoidLeviathan
             var _AwakenedModeEssence = new LeadingConditionRule(new EAIDRC.AwakenedModeActive());
             var _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
 
-            npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsExpert(), ItemType<VoidLeviathanBag>(), 1));
+            npcLoot.Add(ItemDropRule.BossBag(ItemType<VoidLeviathanBag>()));
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ItemType<VoidLeviathanRelicItem>()));
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [..EAList.LeviLoot]));

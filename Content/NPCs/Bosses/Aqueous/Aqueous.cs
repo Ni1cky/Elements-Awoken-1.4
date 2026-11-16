@@ -115,14 +115,12 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Aqueous
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             LeadingConditionRule _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
-            LeadingConditionRule _DropExpert = new LeadingConditionRule(new EAIDRC.DropAwakened());
 
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ModContent.ItemType<AqueousRelicItem>()));
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [.. EAList.AquLoot]));
-            _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ModContent.ItemType<AqueousBag>(), 1));
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<WaterEssence>(), 1, 5, 25));
-            npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<AqueousBag>()));
             npcLoot.Add(_DropNormal);
             //npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<AqueousTrophy>(), 10));
         }

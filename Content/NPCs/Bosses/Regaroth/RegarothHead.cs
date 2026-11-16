@@ -95,7 +95,6 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Regaroth
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             LeadingConditionRule _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
-            LeadingConditionRule _DropExpert = new LeadingConditionRule(new EAIDRC.DropAwakened());
 
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ModContent.ItemType<RegarothRelicItem>()));
 
@@ -104,10 +103,8 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Regaroth
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<RegarothTrophy>(), 10));
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<RegarothMask>(), 10));
 
-            _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ModContent.ItemType<RegarothBag>(), 1));
-
             npcLoot.Add(_DropNormal);
-            npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<RegarothBag>()));
             npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<SkyEssence>(), 1, 5, 25));
 
             var DropArmor = new LeadingConditionRule(new EAIDRC.DropArmor());

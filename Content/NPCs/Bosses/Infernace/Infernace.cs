@@ -211,10 +211,9 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Infernace
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             LeadingConditionRule _DropNormal = new(new EAIDRC.DropNormal());
-            LeadingConditionRule _DropExpert = new(new EAIDRC.DropAwakened());
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [.. EAList.InfeLoot])); npcLoot.Add(_DropNormal);
-            _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ItemType<InfernaceBag>(), 1)); npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.BossBag(ItemType<InfernaceBag>()));
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ItemType<InfernaceRelicItem>()));
             npcLoot.Add(ItemDropRule.Common(ItemType<FireEssence>(), 1, 5, 22));
         }

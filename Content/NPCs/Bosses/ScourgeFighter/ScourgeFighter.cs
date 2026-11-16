@@ -113,7 +113,6 @@ namespace ElementsAwoken.Content.NPCs.Bosses.ScourgeFighter
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             LeadingConditionRule _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
-            LeadingConditionRule _DropExpert = new LeadingConditionRule(new EAIDRC.DropAwakened());
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [.. EAList.ScoLoot]));
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<ScourgeFighterTrophy>(), 10));
@@ -126,9 +125,8 @@ namespace ElementsAwoken.Content.NPCs.Bosses.ScourgeFighter
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ModContent.ItemType<ScourgeFighterRelicItem>()));
             //npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<ScourgeFighterMask>(), 10));
 
-            _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ModContent.ItemType<ScourgeFighterBag>(), 1));
             npcLoot.Add(_DropNormal);
-            npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<ScourgeFighterBag>()));
         }
         public override void OnKill()
         {
