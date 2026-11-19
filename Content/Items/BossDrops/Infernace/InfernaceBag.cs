@@ -46,6 +46,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.Infernace
             itemLoot.Add(_NewItem3);
             _NewItem4.OnSuccess(ItemDropRule.Common(IDropSettings.InfItemId4, chanceDenominator: IDropSettings.InfChanceDenominator4, minimumDropped: IDropSettings.InfMinimumDropped4, maximumDropped: IDropSettings.InfMaximumDropped4));
             itemLoot.Add(_NewItem4);
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.Infernace.Infernace>()));
         }
     }
 }

@@ -43,7 +43,13 @@ namespace ElementsAwoken.Content.Projectiles.NPCProj.Wasteland
             if (!NPC.AnyNPCs(NPCType<NPCs.Bosses.Wasteland.Wasteland>()))
             {
                 Projectile.ai[0] = 0;
-                NPC dryad = Main.npc[NPC.FindFirstNPC(NPCID.Dryad)];
+                int dryadID = NPC.FindFirstNPC(NPCID.Dryad);
+                if (dryadID < 0)
+                {
+                    Projectile.Kill();
+                    return;
+                }
+                NPC dryad = Main.npc[dryadID];
                 desiredLoc = dryad.Center;
                 Vector2 toTarget = new Vector2(desiredLoc.X - Projectile.Center.X, desiredLoc.Y - Projectile.Center.Y);
                 toTarget.Normalize();
@@ -56,7 +62,6 @@ namespace ElementsAwoken.Content.Projectiles.NPCProj.Wasteland
             }
             else
             {
-                NPC dryad = Main.npc[NPC.FindFirstNPC(NPCID.Dryad)];
                 if (Projectile.ai[0] == 0)
                 {
                     Vector2 toTarget = new Vector2(desiredLoc.X - Projectile.Center.X, desiredLoc.Y - Projectile.Center.Y);

@@ -9,10 +9,12 @@ using System;
 using System.IO;
 using Terraria;
 using Terraria.Audio;
+using Terraria.Chat;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.Events;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using static Terraria.ModLoader.ModContent;
 
@@ -93,7 +95,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Wasteland
             NPC.aiStyle = -1;
             NPC.damage = 0;
             NPC.defense = 15;
-            NPC.lifeMax = 5000;          
+            NPC.lifeMax = 4300;
             NPC.knockBackResist = 0f;
             NPC.value = Item.buyPrice(0, 5, 0, 0);
             NPC.HitSound = SoundID.NPCHit1;
@@ -206,7 +208,8 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Wasteland
             {
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, 32, hit.HitDirection, -1f, 0, default(Color), 1f);
             }
-            if (NPC.life <= 0)
+            // no gore when the Dryad spares Wasteland: it burrows away in one piece (see PreKill)
+            if (NPC.life <= 0 && aiTimer >= 0)
             {
                 for (int k = 0; k < 20; k++)
                 {
@@ -222,16 +225,14 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Wasteland
         {
             LeadingConditionRule _AwakenedMode = new LeadingConditionRule(new EAIDRC.AwakenedModeActive());
             LeadingConditionRule _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
-            LeadingConditionRule _DropExpert = new LeadingConditionRule(new EAIDRC.DropAwakened());
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [.. EAList.WasLoot]));
-            _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ItemType<WastelandBag>()));
             _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<WastelandTrophy>(), 10));
             _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<WastelandMask>(), 10));
-            _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<DesertEssence>(), minimumDropped: 5, maximumDropped: 20));
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ItemType<WastelandRelicItem>(), 1));
             npcLoot.Add(_DropNormal);
-            npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.BossBag(ItemType<WastelandBag>()));
+            npcLoot.Add(ItemDropRule.Common(ItemType<DesertEssence>(), 1, 5, 20));
 
             _AwakenedMode.OnSuccess(ItemDropRule.Common(ItemType<TheAntidote>()));
             npcLoot.Add(_AwakenedMode);
@@ -261,13 +262,20 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Wasteland
         }
         public override bool PreKill()
         {
+            // Spared by the Dryad: Wasteland burrows away instead of dying, but it still counts as defeated and drops its loot, as in 1.3
             if (aiTimer < 0)
             {
-                Main.NewText(GetInstance<EALocalization>().Wasteland,Color.MediumPurple);
-                NPC death = Main.npc[NPC.NewNPC(EAU.NPCs(NPC), (int)NPC.Center.X, (int)NPC.Center.Y, NPCType<WastelandDeath>())];
-                death.spriteDirection = NPC.spriteDirection;
-                death.Center = NPC.Center;
-                return false;
+                if (Main.netMode == NetmodeID.Server) ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Mods.ElementsAwoken.Said.Wasteland"), Color.MediumPurple);
+                else Main.NewText(GetInstance<EALocalization>().Wasteland, Color.MediumPurple);
+
+                int deathIndex = NPC.NewNPC(EAU.NPCs(NPC), (int)NPC.Center.X, (int)NPC.Center.Y, NPCType<WastelandDeath>());
+                if (deathIndex < Main.maxNPCs)
+                {
+                    NPC death = Main.npc[deathIndex];
+                    death.spriteDirection = NPC.spriteDirection;
+                    death.Center = NPC.Center;
+                    death.netUpdate = true;
+                }
             }
             return base.PreKill();
         }
@@ -318,7 +326,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Wasteland
                         {
                             dryadNPC.alpha = 255;
                             aiTimer = -720;
-                            Projectile.NewProjectile(EAU.NPCs(NPC), dryadNPC.Center, Vector2.Zero, ProjectileType<WastelandDryad>(), 0, 0, Main.myPlayer);
+                            if (Main.netMode != NetmodeID.MultiplayerClient) Projectile.NewProjectile(EAU.NPCs(NPC), dryadNPC.Center, Vector2.Zero, ProjectileType<WastelandDryad>(), 0, 0, Main.myPlayer);
                         }
                     }
                 }

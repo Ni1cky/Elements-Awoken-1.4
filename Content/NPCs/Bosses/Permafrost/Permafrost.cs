@@ -67,7 +67,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Permafrost
         {
             NPC.width = 152;
             NPC.height = 158;
-            NPC.lifeMax = 65000;
+            NPC.lifeMax = 40000;
             NPC.damage = 80;
             NPC.defense = 36;
             NPC.knockBackResist = 0f;
@@ -139,16 +139,14 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Permafrost
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             LeadingConditionRule _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
-            LeadingConditionRule _DropExpert = new LeadingConditionRule(new EAIDRC.DropAwakened());
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [.. EAList.PermLoot]));
             _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<PermafrostTrophy>(), 10));
             _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<PermafrostMask>(), 10));
-            _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ItemType<PermafrostBag>(), 1));
-            _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<FrostEssence>(), minimumDropped: 5, maximumDropped: 25));
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ItemType<PermafrostRelicItem>()));
             npcLoot.Add(_DropNormal);
-            npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.BossBag(ItemType<PermafrostBag>()));
+            npcLoot.Add(ItemDropRule.Common(ItemType<FrostEssence>(), 1, 5, 25));
         }
         public override void OnKill()
         {
@@ -160,7 +158,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Permafrost
             }
             MyWorld.downedPermafrost = true;
             if (Main.netMode == NetmodeID.Server) NetMessage.SendData(MessageID.WorldData);
-            Terraria.Graphics.Effects.Filters.Scene["Shockwave"].Deactivate();
+            if (!Main.dedServ) Terraria.Graphics.Effects.Filters.Scene["Shockwave"].Deactivate(); // screen shaders don't exist on servers
         }
         public override void BossLoot(ref int potionType)
         {

@@ -328,6 +328,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
         public int encounterTextAlpha = 0;
         public int encounterTextTimer = 0;
         public bool finalText = false;
+        public int encounterLine = 0; // the last encounter line shown to the local player (0 = none yet)
 
         // screenshake
         public float screenshakeAmount = 0; // dont go above 15 unless you want to have a seizure
@@ -1592,94 +1593,9 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 Player.lifeRegen += 75;
             }
             #region encounters
-            if (ElementsAwoken.encounter != 0)
-            {
-                string Said = this.GetLocalization("Encounter.Said").Value;
-                string Said1 = this.GetLocalization("Encounter.Said1").Value;
-                string Said2 = this.GetLocalization("Encounter.Said2").Value;
-                string Said3 = this.GetLocalization("Encounter.Said3").Value;
-                string Said4 = this.GetLocalization("Encounter.Said4").Value;
-                string Said5 = this.GetLocalization("Encounter.Said5").Value;
-                string Said6 = this.GetLocalization("Encounter.Said6").Value;
-                string Said7 = this.GetLocalization("Encounter.Said7").Value;
-                string Said8 = this.GetLocalization("Encounter.Said8").Value;
-                string Said9 = this.GetLocalization("Encounter.Said9").Value;
-                string Said10 = this.GetLocalization("Encounter.Said10").Value;
-
-                if (ElementsAwoken.encounter == 1)
-                {
-                    screenshakeAmount = 5f;
-                    UISystemSettings.VoidTime++;
-                }
-                if (ElementsAwoken.encounter >= 2)
-                {
-                    if (Player.active && !Player.dead) Player.AddBuff(BuffID.Darkness, 60);
-                    UISystemSettings.VoidSay = true;
-                    UISystemSettings.VoidTime++;
-                }
-                if (UISystemSettings.VoidTime == 400)
-                {
-                    UISystemSettings.VoidTime++;
-                    encounterTextTimer = 300;
-                    encounterTextAlpha = 0;
-                    if (ElementsAwoken.encounter == 1) encounterText = Said;
-                    else if (ElementsAwoken.encounter == 2) encounterText = Said1;
-                    else if (ElementsAwoken.encounter == 3) encounterText = Said2;
-                }
-                else if (UISystemSettings.VoidTime == 800)
-                {
-                    UISystemSettings.VoidTime++;
-                    encounterTextTimer = 300;
-                    encounterTextAlpha = 0;
-                    if (ElementsAwoken.encounter == 1) encounterText = Said3;
-                    else if (ElementsAwoken.encounter == 2) encounterText = Said4;
-                    else if (ElementsAwoken.encounter == 3) encounterText = Said5;
-                }
-                else if (UISystemSettings.VoidTime == 1100)
-                {
-                    UISystemSettings.VoidTime++;
-                    encounterTextTimer = 300;
-                    encounterTextAlpha = 0;
-                    if (ElementsAwoken.encounter == 1) encounterText = Said6;
-                    else if (ElementsAwoken.encounter == 2) encounterText = Said7;
-                    else if (ElementsAwoken.encounter == 3) encounterText = Said8;
-                }
-                else if (UISystemSettings.VoidTime == 1400)
-                {
-                    UISystemSettings.VoidTime++;
-                    if (ElementsAwoken.encounter != 1)
-                    {
-                        encounterTextTimer = 300;
-                        encounterTextAlpha = 0;
-                    }
-                    if (ElementsAwoken.encounter == 2) encounterText = Said9;
-                    else if (ElementsAwoken.encounter == 3)
-                    {
-                        encounterText = Said10;
-                        UISystemSettings.VoidColor = Color.DarkRed;
-                        SoundEngine.PlaySound(SoundID.Zombie105, Player.position);
-                        finalText = true;
-                    }
-                }
-                else if (UISystemSettings.VoidTime == 1700)
-                {
-                    encounterText = "";
-                    screenshakeAmount = 0;
-                    ElementsAwoken.encounterTimer = 0;
-                    ElementsAwoken.encounter = 0;
-                    UISystemSettings.VoidTime = 0;
-                }
-                if (UISystemSettings.VoidTime > 300)
-                {
-                    if (encounterTextAlpha > 255) encounterTextAlpha = 255;
-                    else encounterTextAlpha += (int)Math.Ceiling(255f / 60f);
-                }
-                else
-                {
-                    if (encounterTextAlpha < 0) encounterTextAlpha = 0;
-                    else encounterTextAlpha -= (int)Math.Ceiling(255f / 60f);
-                }
-            }
+            // The encounter itself is shared world state (ElementsAwoken.encounter and encounterTimer, run by AETime and synced
+            // with the world data); only the effects on the local player happen here.
+            if (Player.whoAmI == Main.myPlayer) UpdateEncounterEffects();
             #endregion
 
             ComputerText();
@@ -1798,6 +1714,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 {
                     playerStartPos = Player.Center;
                     startTime = (int)Main.time;
+                    startDayTime = Main.dayTime; // was never set, so the credits always ended at night
                     screenTransition = true;
                 }
                 if (MyWorld.creditsCounter == screenTransDuration / 2)
@@ -1821,10 +1738,12 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 if (MyWorld.creditsCounter >= screenDuration && MyWorld.creditsCounter < creditsLength)
                 {
                     int screenNum = pointsNotFound + (int)Math.Floor((decimal)(MyWorld.creditsCounter / screenDuration));
-                    if (creditPoints[screenNum].X == 0)
+                    // skip every point that wasn't found in this world; past the last point the camera stays where it is
+                    // (indexing without the bounds check threw every tick once enough points were missing)
+                    while (screenNum < creditPoints.Length && creditPoints[screenNum].X == 0)
                     {
                         pointsNotFound++;
-                        screenNum = pointsNotFound + (int)Math.Floor((decimal)(MyWorld.creditsCounter / screenDuration));
+                        screenNum++;
                     }
                     Vector2 scroll = new Vector2(1, -1);
                     if (screenNum == 1) scroll = new Vector2(0, -1);
@@ -1842,7 +1761,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     else if (screenNum == 13) scroll = new Vector2(1, -0.25f);
                     else if (screenNum == 14) scroll = new Vector2(2, 1);
                     else if (screenNum == 15) scroll = new Vector2(0.2f, 1);
-                    CreditsScroll(screenNum, scroll, screenDuration);
+                    if (screenNum < creditPoints.Length) CreditsScroll(screenNum, scroll, screenDuration);
                 }
 
                 Keys[] pressedKeys = Main.keyState.GetPressedKeys();
@@ -1878,6 +1797,9 @@ namespace ElementsAwoken.EASystem.EAPlayer
             {
                 MyWorld.creditsCounter = 0;
                 escHeldTimer = 0;
+                // the points are searched again the next time the credits play, they may be in another world by then
+                pointsNotFound = 0;
+                Array.Clear(creditPoints);
             }
             if (screenTransition)
             {
@@ -2237,6 +2159,8 @@ namespace ElementsAwoken.EASystem.EAPlayer
 
             encounterTextAlpha = 0;
             encounterTextTimer = 0;
+            encounterLine = 0;
+            finalText = false;
         }
 
         private bool InstalledPack()
@@ -2405,6 +2329,60 @@ namespace ElementsAwoken.EASystem.EAPlayer
             if (MyWorld.creditsCounter - counterN == screenTransDuration / 2) desiredScPos = creditPoints[screenNum];
             if (MyWorld.creditsCounter - counterN > screenTransDuration / 2) Player.Center = desiredScPos;
             if (MyWorld.creditsCounter - counterN > screenTransDuration / 2 && MyWorld.creditsCounter > counterN && MyWorld.creditsCounter < screenDuration * (screenNum + 1) + screenTransDuration / 2) desiredScPos += scroll;
+        }
+        private void UpdateEncounterEffects()
+        {
+            int encounter = ElementsAwoken.encounter;
+            if (encounter == 0)
+            {
+                encounterLine = 0;
+                encounterTextTimer = 0;
+                finalText = false;
+                return;
+            }
+            if (encounter == 1) screenshakeAmount = 5f;
+            else if (Player.active && !Player.dead) Player.AddBuff(BuffID.Darkness, 60);
+
+            // Lines come at fixed points of the encounter timer (counting down from 3600), as in 1.3. The line is picked by range
+            // instead of an exact tick, so a client whose timer was corrected by a world sync (or who joined mid-encounter) still gets it.
+            int timer = ElementsAwoken.encounterTimer;
+            int line = timer > 3200 ? 0 : timer > 2700 ? 1 : timer > 2200 ? 2 : timer > 1700 ? 3 : 4;
+            if (line != encounterLine)
+            {
+                encounterLine = line;
+                string key = (encounter, line) switch
+                {
+                    (1, 1) => "Said",
+                    (1, 2) => "Said3",
+                    (1, 3) => "Said6",
+                    (2, 1) => "Said1",
+                    (2, 2) => "Said4",
+                    (2, 3) => "Said7",
+                    (2, 4) => "Said9",
+                    (3, 1) => "Said2",
+                    (3, 2) => "Said5",
+                    (3, 3) => "Said8",
+                    (3, 4) => "Said10",
+                    _ => null
+                };
+                if (key != null)
+                {
+                    encounterText = this.GetLocalization("Encounter." + key).Value;
+                    encounterTextTimer = 300;
+                    encounterTextAlpha = 0;
+                    if (encounter == 3 && line == 4)
+                    {
+                        SoundEngine.PlaySound(SoundID.Zombie105, Player.position);
+                        finalText = true;
+                    }
+                }
+            }
+
+            // each line fades in, stays and fades out over 5 seconds
+            if (encounterTextTimer > 0) encounterTextTimer--;
+            if (encounterTextTimer == 0) finalText = false;
+            if (encounterTextTimer > 60) encounterTextAlpha = Math.Min(encounterTextAlpha + (int)Math.Ceiling(255f / 60f), 255);
+            else encounterTextAlpha = Math.Max(encounterTextAlpha - (int)Math.Ceiling(255f / 60f), 0);
         }
         private void ComputerText()
         {
@@ -2912,7 +2890,6 @@ namespace ElementsAwoken.EASystem.EAPlayer
         public override void ModifyHurt(ref Player.HurtModifiers modifiers)
         {
             var source = Main.LocalPlayer.GetSource_FromThis();
-            float damage = modifiers.SourceDamage.Base;
             if (wispForm)
             {
                 modifiers.DisableSound();
@@ -2926,34 +2903,39 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 }
             }
 
-            damage = (int)(damage * damageTaken);
+            modifiers.SourceDamage *= damageTaken;
 
-            if (honeyCocooned> 0)
+            if (modifiers.DamageSource.SourceOtherIndex == 0) // fall damage
             {
-                if (!Player.immune)
+                if (puffFall) modifiers.SourceDamage *= 0.5f;
+                if (arid) modifiers.SourceDamage *= MathHelper.Clamp(aridFalling, 0, Player.maxFallSpeed) / Player.maxFallSpeed;
+                if (gelticConqueror && !Player.controlDown) modifiers.SourceDamage *= 0.25f;
+            }
+            if (modifiers.DamageSource.SourceOtherIndex == 3) // spikes and other tiles that hurt on touch
+            {
+                if (templeSpikeBoots)
                 {
-                    honeyCocoonDamage += (int)damage;
-                    CombatText.NewText(Player.getRect(), Color.Orange, honeyCocoonDamage);
-                    if (honeyCocoonDamage >= 100)
-                    {
-                        honeyCocooned = 0;
-                        SoundEngine.PlaySound(SoundID.NPCDeath1, Player.position);
-
-                        Vector2 pos = Player.Center;
-                        int numDusts = 36;
-                        for (int i = 0; i < numDusts; i++)
-                        {
-                            Vector2 position = Vector2.One.RotatedBy((double)((float)(i - (numDusts / 2 - 1)) * 6.28318548f / (float)numDusts), default(Vector2)) + pos;
-                            Vector2 velocity = position - pos;
-                            Vector2 spawnPos = position + velocity;
-                            Dust dust = Main.dust[Dust.NewDust(spawnPos, 0, 0, 153, velocity.X * 2f, velocity.Y * 2f, 100, default(Color), 1f)];
-                            dust.noGravity = true;
-                            dust.noLight = true;
-                            dust.velocity = Vector2.Normalize(velocity) * 6f * Main.rand.NextFloat(0.8f, 1.2f);
-                        }
-                    }
-                    SoundEngine.PlaySound(SoundID.NPCHit1.WithPitchOffset(-0.2f), Player.position);
+                    modifiers.Cancel();
+                    return;
                 }
+                if (spikeBoots)
+                {
+                    modifiers.ModifyHurtInfo += (ref Player.HurtInfo info) =>
+                    {
+                        if (info.SourceDamage <= 46) info.Cancelled = true;
+                    };
+                }
+            }
+
+            if (honeyCocooned > 0)
+            {
+                // the cocoon takes the hit instead of the player and breaks once it has absorbed 100 damage
+                bool absorb = !Player.immune;
+                modifiers.ModifyHurtInfo += (ref Player.HurtInfo info) =>
+                {
+                    if (absorb && !info.Cancelled) AbsorbHitWithHoneyCocoon(info.SourceDamage);
+                    info.Cancelled = true;
+                };
                 Player.immuneTime = 30;
                 Player.immune = true;
                 return;
@@ -2986,48 +2968,42 @@ namespace ElementsAwoken.EASystem.EAPlayer
             }
             if (Player.FindBuffIndex(BuffType<ChaosShield>()) != -1 && !Player.dead)
             {
-                chaosBoost += damage;
-                damage /= 5;
-            }
-            if (oceanicArmor)
-            {
-                if (damage > 25)
-                {
-                    for (int i = 0; i < 5; i++)
-                    {
-                        float speed = Main.rand.Next(-6, 6);
-                        Projectile.NewProjectile(source, Player.Center.X, Player.Center.Y, speed, speed, ProjectileType<PoisonWater>(), 60, 1.25f, Main.myPlayer, 0f, 0f);
-                    }
-                }
+                modifiers.SourceDamage /= 5; // the blocked damage is stored as a damage boost in OnHurt
             }
             if (viridiumDash)
             {
                 explosionEffect(Player, ProjectileType<Explosion>(), 1000, 10f, 21);
+                modifiers.Cancel();
                 return;
             }
             if (aegisDashTimer > 0)
             {
-                damage = (int)(damage * 0.1f);
+                modifiers.SourceDamage *= 0.1f;
             }
             if (voidEnergyTimer > 0)
             {
-                damage = (int)(damage * 0.5f);
+                modifiers.SourceDamage *= 0.5f;
             }
             if (flingToShackle)
             {
+                modifiers.Cancel();
                 return;
             }
             if (icyHeart)
             {
-                damage = (int)(damage * icyHeartDR);
                 icyHeartTimer = -600;
-                if (damage == 0) return;
+                if (icyHeartDR <= 0f)
+                {
+                    modifiers.Cancel();
+                    return;
+                }
+                modifiers.SourceDamage *= icyHeartDR;
             }
             if (starstruck)
             {
-                damage = (int)(damage * MathHelper.Lerp(1, 4, (float)starstruckCounter / 20));
+                modifiers.SourceDamage *= MathHelper.Lerp(1, 4, (float)starstruckCounter / 20);
             }
-            if (hellFury) damage *= 2;
+            if (hellFury) modifiers.SourceDamage *= 2f;
             if (glassHeart)
             {
                 modifiers.DisableSound();
@@ -3037,24 +3013,37 @@ namespace ElementsAwoken.EASystem.EAPlayer
                 return;
 
             }
-            return;
+        }
+        private void AbsorbHitWithHoneyCocoon(int damage)
+        {
+            honeyCocoonDamage += damage;
+            CombatText.NewText(Player.getRect(), Color.Orange, honeyCocoonDamage);
+            if (honeyCocoonDamage >= 100)
+            {
+                honeyCocooned = 0;
+                SoundEngine.PlaySound(SoundID.NPCDeath1, Player.position);
+
+                Vector2 pos = Player.Center;
+                int numDusts = 36;
+                for (int i = 0; i < numDusts; i++)
+                {
+                    Vector2 position = Vector2.One.RotatedBy((double)((float)(i - (numDusts / 2 - 1)) * 6.28318548f / (float)numDusts), default(Vector2)) + pos;
+                    Vector2 velocity = position - pos;
+                    Vector2 spawnPos = position + velocity;
+                    Dust dust = Main.dust[Dust.NewDust(spawnPos, 0, 0, 153, velocity.X * 2f, velocity.Y * 2f, 100, default(Color), 1f)];
+                    dust.noGravity = true;
+                    dust.noLight = true;
+                    dust.velocity = Vector2.Normalize(velocity) * 6f * Main.rand.NextFloat(0.8f, 1.2f);
+                }
+            }
+            SoundEngine.PlaySound(SoundID.NPCHit1.WithPitchOffset(-0.2f), Player.position);
         }
         public override void OnHurt(Player.HurtInfo info)
         {
             var source = Main.LocalPlayer.GetSource_FromThis();
-            float damage = info.Damage;
-
-            if (puffFall)
-            {
-                if (info.DamageSource.SourceOtherIndex == 0)
-                {
-                    damage /= 2f;
-                    info.Damage = (int)damage; 
-                }
-            }
             if (lightningCloud && lightningCloudCharge > 60)
             {
-                if (damage > 0 && info.DamageSource.SourceOtherIndex != 0)
+                if (info.Damage > 0 && info.DamageSource.SourceOtherIndex != 0)
                 {
                     SoundEngine.PlaySound(SoundID.Item93, Player.position);
 
@@ -3087,26 +3076,23 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     lightningCloudCharge = 0;
                 }
             }
-            if (puffFall)
+            // OnHurt also runs for other players' copies when their hits are synced, so these only run for the local player
+            if (Player.whoAmI == Main.myPlayer)
             {
-                if (info.DamageSource.SourceOtherIndex == 0)
+                if (Player.FindBuffIndex(BuffType<ChaosShield>()) != -1 && !Player.dead)
                 {
-                    damage /= 2;
+                    // the shield cut this hit to a fifth in ModifyHurt; the full damage is stored as a damage boost
+                    chaosBoost += info.SourceDamage * 5;
+                }
+                if (oceanicArmor && info.SourceDamage > 25)
+                {
+                    for (int i = 0; i < 5; i++)
+                    {
+                        float speed = Main.rand.Next(-6, 6);
+                        Projectile.NewProjectile(source, Player.Center.X, Player.Center.Y, speed, speed, ProjectileType<PoisonWater>(), 60, 1.25f, Main.myPlayer, 0f, 0f);
+                    }
                 }
             }
-            if (arid && info.DamageSource.SourceOtherIndex == 0)
-            {
-                damage = (int)(damage * (MathHelper.Clamp(aridFalling, 0, Player.maxFallSpeed) / Player.maxFallSpeed));
-            }
-            if (gelticConqueror)
-            {
-                if (info.DamageSource.SourceOtherIndex == 0 && !Player.controlDown)
-                {
-                    damage = (int)(damage * 0.25);
-                }
-            }
-            if (spikeBoots && info.DamageSource.SourceOtherIndex == 3 && damage <= 46) return;
-            if (templeSpikeBoots && info.DamageSource.SourceOtherIndex == 3) return;
         }
         public override bool CanConsumeAmmo(Item weapon, Item ammo)
         {
@@ -3115,6 +3101,8 @@ namespace ElementsAwoken.EASystem.EAPlayer
         }
         public override void PostHurt(Player.HurtInfo info)
         {
+            // PostHurt also runs for other players' copies when their hits are synced, so only the local player spawns projectiles here
+            bool localPlayer = Player.whoAmI == Main.myPlayer;
             if (vleviAegis)
             {
                 vleviAegisDamage += (int)info.Damage;
@@ -3126,7 +3114,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     abyssalRage = 600;
                 }
             }
-            if (toyArmor && toyArmorCooldown <= 0)
+            if (toyArmor && toyArmorCooldown <= 0 && localPlayer)
             {
                 for (int i = 0; i < Main.rand.Next(1, 4); i++)
                 {
@@ -3138,7 +3126,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
             {
                 voidWalkerRegen = 180;
             }
-            if (voidBlood)
+            if (voidBlood && localPlayer)
             {
                 int bloodDamage = 10;
                 if (NPC.downedBoss1) bloodDamage = 15;
@@ -3152,7 +3140,7 @@ namespace ElementsAwoken.EASystem.EAPlayer
                     Projectile proj = Main.projectile[Projectile.NewProjectile(EAU.Play(Player), Player.Center.X, Player.Center.Y, Main.rand.NextFloat(-3f, 3f), Main.rand.NextFloat(-3f, 3f), Mod.Find<ModProjectile>("VoidBlood").Type, bloodDamage, 0f, Main.myPlayer, 0f, 0f)];
                 }
             }
-            if (slimeBooster)
+            if (slimeBooster && localPlayer)
             {
                 for (int i = 0; i < 7; i++)
                 {

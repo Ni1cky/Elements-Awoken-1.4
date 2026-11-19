@@ -3,12 +3,18 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace ElementsAwoken.Content.NPCs.Prompts
 {
     public class InfernaceSpawner : ModNPC
     {
+        public override void SetStaticDefaults()
+        {
+            // not shown in the bestiary: the visual Infernace summoning helper, it duplicates the Infernace's Guardian entry and can never be completed
+            NPCID.Sets.NPCBestiaryDrawOffset[Type] = new NPCID.Sets.NPCBestiaryDrawModifiers() { Hide = true };
+        }
         public override string Texture { get { return "ElementsAwoken/Content/NPCs/Prompts/InfernaceGuardian"; } }
         private float visualsAI
         {

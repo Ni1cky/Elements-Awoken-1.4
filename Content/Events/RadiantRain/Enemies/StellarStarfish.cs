@@ -38,10 +38,6 @@ namespace ElementsAwoken.Content.Events.RadiantRain.Enemies
         {
             bestiaryEntry.Info.AddRange([new FlavorTextBestiaryInfoElement("Mods.ElementsAwoken.Bestiary.Enemies.StellarStarfish")]);
         }
-        public override void SetStaticDefaults()
-        {
-            NPCID.Sets.CountsAsCritter[NPC.type] = true;
-        }
         public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)
         {
             target.AddBuff(BuffType<Starstruck>(), 300);

@@ -148,7 +148,6 @@ namespace ElementsAwoken
             swearingEnemies = false;
             ElementsAwoken.encounter = 0;
             ElementsAwoken.encounterTimer = 0;
-            ElementsAwoken.encounterSetup = false;
             aqueousDrive = false;
             azanaDrive = false;
             celestialDrive = false;
@@ -362,6 +361,9 @@ namespace ElementsAwoken
             writer.Write(voidPrompt);
             writer.Write(moonlordKills);
             writer.Write(voidLeviathanKills);
+            // encounters start in OnKill, which only runs on the server; clients get them here and run them on their own (AETime)
+            writer.Write((byte)ElementsAwoken.encounter);
+            writer.Write((short)ElementsAwoken.encounterTimer);
         }
         public override void NetReceive(BinaryReader reader)
         {
@@ -423,6 +425,8 @@ namespace ElementsAwoken
             voidPrompt = reader.ReadInt32();
             moonlordKills = reader.ReadInt32();
             voidLeviathanKills = reader.ReadInt32();
+            ElementsAwoken.encounter = reader.ReadByte();
+            ElementsAwoken.encounterTimer = reader.ReadInt16();
         }
         public override void Load()
         {
@@ -621,7 +625,7 @@ namespace ElementsAwoken
                     VoidEvent.StartInvasion();
                     Main.invasionX = Main.spawnTileX;
                     voidInvasionWillStart = false;
-                    Filters.Scene.Deactivate("MoonLordShake", new object[0]);
+                    if (!Main.dedServ) Filters.Scene.Deactivate("MoonLordShake", new object[0]);
                 }
                 float intensity = MathHelper.Clamp((float)Main.time / 54000f, 0f, 1f);
                 MoonlordShake(intensity);
@@ -876,6 +880,7 @@ namespace ElementsAwoken
         }
         private void MoonlordShake(float intensity)
         {
+            if (Main.dedServ) return; // screen shaders don't exist on servers
             if (Main.netMode == NetmodeID.SinglePlayer)
             {
                 Player player = Main.LocalPlayer;

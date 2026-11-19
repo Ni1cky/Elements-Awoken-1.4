@@ -23,7 +23,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.TheTempleKeepers
         {
             NPC.width = 66;
             NPC.height = 52;
-            NPC.lifeMax = 35000;
+            NPC.lifeMax = 25000;
             NPC.damage = 0;
             NPC.defense = 40;
             NPC.knockBackResist = 0f;
@@ -72,7 +72,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.TheTempleKeepers
             AncientWyrm.OnSuccess(ItemDropRule.Common(ModContent.ItemType<TempleFragment>()));
 
             AncientWyrm.OnSuccess(ItemDropRule.OneFromOptions(1, [.. EAList.TempLoot]));
-            AncientWyrm.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ModContent.ItemType<TempleKeepersBag>(), 1));
+            AncientWyrm.OnSuccess(ItemDropRule.BossBag(ModContent.ItemType<TempleKeepersBag>()));
             npcLoot.Add(AncientWyrm);
         }
         public override void OnKill()

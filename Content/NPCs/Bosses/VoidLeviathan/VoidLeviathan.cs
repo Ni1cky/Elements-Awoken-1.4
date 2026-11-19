@@ -13,11 +13,13 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
 using Terraria;
+using Terraria.Chat;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using static ElementsAwoken.EASystem.Biome.EABiomes;
 using static Terraria.ModLoader.ModContent;
@@ -82,11 +84,10 @@ namespace ElementsAwoken.Content.NPCs.Bosses.VoidLeviathan
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {            
             var _AwakenedMode = new LeadingConditionRule(new EAIDRC.AwakenedModeActive());
-            var _AwakenedModeEssence = new LeadingConditionRule(new EAIDRC.DropAwakened());
-            var _DropExpert = new LeadingConditionRule(new EAIDRC.DropExpert());
+            var _AwakenedModeEssence = new LeadingConditionRule(new EAIDRC.AwakenedModeActive());
             var _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
 
-            npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsExpert(), ItemType<VoidLeviathanBag>(), 1));
+            npcLoot.Add(ItemDropRule.BossBag(ItemType<VoidLeviathanBag>()));
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ItemType<VoidLeviathanRelicItem>()));
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [..EAList.LeviLoot]));
@@ -97,10 +98,10 @@ namespace ElementsAwoken.Content.NPCs.Bosses.VoidLeviathan
 
             _AwakenedMode.OnSuccess(ItemDropRule.Common(ItemType<AbyssalMatter>()));
             npcLoot.Add(_AwakenedMode);
+            // more essence in Awakened mode, the regular amount in every other mode
             _AwakenedModeEssence.OnSuccess(ItemDropRule.Common(ItemType<VoidEssence>(), minimumDropped: 8, maximumDropped: 20));
+            _AwakenedModeEssence.OnFailedConditions(ItemDropRule.Common(ItemType<VoidEssence>(), minimumDropped: 5, maximumDropped: 13));
             npcLoot.Add(_AwakenedModeEssence);
-            _DropExpert.OnSuccess(ItemDropRule.Common(ItemType<VoidEssence>(), minimumDropped: 5, maximumDropped: 13));
-            npcLoot.Add(_DropExpert);
         }
         public override void OnKill()
         {
@@ -109,7 +110,9 @@ namespace ElementsAwoken.Content.NPCs.Bosses.VoidLeviathan
                 ElementsAwoken.encounter = 3;
                 ElementsAwoken.encounterTimer = 3600;
                 ElementsAwoken.DebugModeText("encounter 3 start");
-                Main.NewText(GetInstance<EALocalization>().VoidLeviathanHead, new Color(235, 70, 106));
+                // OnKill only runs on the server in multiplayer, so the message has to be broadcast
+                if (Main.netMode == NetmodeID.Server) ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Mods.ElementsAwoken.Said.VoidLeviathanHead"), new Color(235, 70, 106));
+                else Main.NewText(GetInstance<EALocalization>().VoidLeviathanHead, new Color(235, 70, 106));
             }
             if (MyWorld.voidLeviathanKills < 3)
             {

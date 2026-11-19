@@ -44,7 +44,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Ancients
             NPC.width = 140;
             NPC.height = 144;
             NPC.aiStyle = -1;
-            NPC.lifeMax = 1500000;
+            NPC.lifeMax = 1200000;
             NPC.damage = 200;
             NPC.defense = 90;
             NPC.knockBackResist = 0f;
@@ -128,14 +128,12 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Ancients
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             var _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
-            var _DropExpert = new LeadingConditionRule(new EAIDRC.DropAwakened());
 
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ItemType<AncientsRelicItem>()));
 
-            _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ItemType<AncientsBag>(), 1));
             _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<CrystalAmalgamate>(), minimumDropped:1, maximumDropped:1));
             _DropNormal.OnSuccess(ItemDropRule.Common(ItemType<AncientShard>(), minimumDropped:5, maximumDropped:8));
-            npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.BossBag(ItemType<AncientsBag>()));
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [.. EAList.AncLot]));
             npcLoot.Add(_DropNormal);

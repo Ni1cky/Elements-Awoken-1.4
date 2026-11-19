@@ -40,6 +40,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.Wasteland
             itemLoot.Add(_NewItem3);
             _NewItem4.OnSuccess(ItemDropRule.Common(IDropSettings.WasItemId4, chanceDenominator: IDropSettings.WasChanceDenominator4, minimumDropped: IDropSettings.WasMinimumDropped4, maximumDropped: IDropSettings.WasMaximumDropped4));
             itemLoot.Add(_NewItem4);
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.Wasteland.Wasteland>()));
         }
     }
 }

@@ -43,6 +43,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.VoidLeviathan
 
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<VoidLeviathanMask>(), 10));
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<VoidLeviathanTrophy>(), 10));
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.VoidLeviathan.VoidLeviathanHead>()));
         }
         public override void RightClick(Player player)
         {

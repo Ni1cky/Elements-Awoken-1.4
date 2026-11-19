@@ -43,6 +43,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.TheTempleKeepers
 
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<WyrmHeart>()));
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<TempleFragment>()));
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.TheTempleKeepers.AncientWyrmHead>()));
         }
         public override void RightClick(Player player)
         {

@@ -11,6 +11,11 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Regaroth.RegarothMinion
 {
     public class RegarothMinionBody : ModNPC
     {
+        public override void SetStaticDefaults()
+        {
+            // not shown in the bestiary: segment of the Thunderling, which has its own entry
+            NPCID.Sets.NPCBestiaryDrawOffset[Type] = new NPCID.Sets.NPCBestiaryDrawModifiers() { Hide = true };
+        }
         public int dayTime = 0;
         public override void SetDefaults()
         {

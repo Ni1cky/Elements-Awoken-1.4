@@ -46,6 +46,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.Permafrost
 
             _AwakenedMode.OnSuccess(ItemDropRule.Common(ModContent.ItemType<IcyHeart>()));
             itemLoot.Add(_AwakenedMode);
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.Permafrost.Permafrost>()));
         }
         public override void RightClick(Player player)
         {

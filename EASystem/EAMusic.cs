@@ -40,7 +40,7 @@ namespace ElementsAwoken.EASystem
 
             public override bool IsSceneEffectActive(Player player)
             {
-                return ElementsAwoken.encounterTimer > 0;
+                return ElementsAwoken.encounter != 0;
             }
         }
     }

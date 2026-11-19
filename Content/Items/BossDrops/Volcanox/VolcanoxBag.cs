@@ -46,6 +46,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.Volcanox
 
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<Pyroplasm>(), minimumDropped:10, maximumDropped: 60));
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<VolcanicStone>(), minimumDropped:10, maximumDropped: 25));
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.Volcanox.Volcanox>()));
         }
         public override void RightClick(Player player)
         {

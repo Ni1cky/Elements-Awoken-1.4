@@ -2,6 +2,7 @@
 using ElementsAwoken.Content.Buffs.Other;
 using ElementsAwoken.Content.Buffs.PotionBuffs;
 using ElementsAwoken.Content.Dusts;
+using ElementsAwoken.Content.Events.VoidEvent.Enemies.Phase2.ShadeWyrm;
 using ElementsAwoken.Content.Items.Accessories;
 using ElementsAwoken.Content.Items.Donator.Buildmonger;
 using ElementsAwoken.Content.Items.Donator.Crow;
@@ -264,15 +265,6 @@ namespace ElementsAwoken.EASystem.EAPlayer
         }
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {
-            foreach (NPC npc in Main.npc)
-            {
-                if (npc.active && npc.boss)
-                {
-                    spawnRate = 0;
-                    maxSpawns = 0;
-                    break;
-                }
-            }
             if (player.FindBuffIndex(BuffType<CalamityPotionBuff>()) != -1)
             {
                 spawnRate = (int)(spawnRate / 12.5f);
@@ -321,7 +313,19 @@ namespace ElementsAwoken.EASystem.EAPlayer
         }
         public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
         {
-            if (AnyBoss()) pool.Clear();
+            // No regular enemies while one of EA's bosses is alive. 1.3 did this for any boss, which also stopped spawns
+            // during vanilla and other mods' boss fights and events (e.g. Martian Madness while a Martian Saucer is alive).
+            if (AnyEABoss()) pool.Clear();
+        }
+        private bool AnyEABoss()
+        {
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                // The Shade Wyrm is only a Void Event miniboss (it got boss = true in the port, it didn't have it in 1.3), so it must not stop the event's own spawns.
+                // The Radiant Master is not skipped: it was a boss in 1.3 too, and Radiant Rain spawns stopped while it was alive there as well.
+                if (npc.boss && npc.ModNPC?.Mod == Mod && npc.ModNPC is not ShadeWyrm) return true;
+            }
+            return false;
         }
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {

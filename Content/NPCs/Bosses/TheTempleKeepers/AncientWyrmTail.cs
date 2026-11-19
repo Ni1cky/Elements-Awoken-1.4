@@ -12,6 +12,11 @@ namespace ElementsAwoken.Content.NPCs.Bosses.TheTempleKeepers
 {    
     public class AncientWyrmTail : ModNPC
     {
+        public override void SetStaticDefaults()
+        {
+            // not shown in the bestiary: segment of the Ancient Wyrm, which has its own entry
+            NPCID.Sets.NPCBestiaryDrawOffset[Type] = new NPCID.Sets.NPCBestiaryDrawModifiers() { Hide = true };
+        }
         public int dayTime = 0;
         public override void SetDefaults()
         {

@@ -26,7 +26,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Ancients
             NPC.width = 88;
             NPC.height = 88;
             NPC.aiStyle = -1;
-            NPC.lifeMax = 300000;
+            NPC.lifeMax = 200000;
             NPC.damage = 100;
             NPC.defense = 60;
             NPC.knockBackResist = 0f;

@@ -1,71 +1,62 @@
-﻿using ElementsAwoken.EASystem.EAPlayer;
-using Microsoft.Xna.Framework;
-using System;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 
 namespace ElementsAwoken.EASystem
 {
     public class AETime : ModSystem
     {
+        // which encounter this machine has already done the one-time setup for (0 = none)
+        private int setUpEncounter = 0;
+
+        public override void ClearWorld()
+        {
+            setUpEncounter = 0;
+        }
         public override void PostUpdateTime()
         {
-            Player player = Main.player[Main.myPlayer];
-            MyPlayer modPlayer = player.GetModPlayer<MyPlayer>();
-
-            var encounter = ElementsAwoken.encounter;
-            var encounterTimer = ElementsAwoken.encounterTimer;
-            var encounterSetup = ElementsAwoken.encounterSetup;
-
-            if (!Main.gameMenu)
+            // Encounters (the Abraxis scenes after the first kill of Infernace, Permafrost and Void Leviathan).
+            // ElementsAwoken.encounter and encounterTimer are started in the boss's OnKill on the server (or in singleplayer)
+            // and synced to clients with the world data (MyWorld.NetSend). This runs once per tick on every machine, so clients
+            // advance the encounter on their own between syncs. The per-player part (text, screen shake, Darkness) is in MyPlayer.
+            if (Main.gameMenu) return;
+            int encounter = ElementsAwoken.encounter;
+            if (encounter == 0)
             {
-                if (encounter != 0)
+                setUpEncounter = 0;
+                return;
+            }
+            if (setUpEncounter != encounter)
+            {
+                setUpEncounter = encounter;
+                if (encounter >= 2)
                 {
-                    encounterTimer--;
-                    if (encounterTimer <= 0)
-                    {
-                        encounterTimer = 0;
-                        encounter = 0;
-                    }
-                    if (!encounterSetup)
-                    {
-                        encounterSetup = true;
-                        modPlayer.encounterTextTimer = 0;
-                        if (encounter >= 2)
-                        {
-                            Main.rainTime = 3600;
-                            Main.raining = true;
-                            Main.maxRaining = 0.8f;
-                        }
-                    }
-                    if (encounter == 1)
-                    {
-                        if (encounterTimer <= 1600) encounterTimer = 0;
-                    }
-                    if (encounter == 2)
-                    {
-                        if (!Main.gameMenu)
-                        {
-                            Main.time += Main.rand.Next(8, 25);
-                            if (Main.time > 32400.0 - 30)
-                            {
-                                Main.time = 0;
-                            }
-                        }
-                    }
-                    if (encounter == 3)
-                    {
-                        Main.time = 16220;
-                        Main.dayTime = false;
-                    }
-                    if (modPlayer.encounterTextTimer > 0 || encounter == 3)
-                    {
-                        ElementsAwoken.DebugModeText("Encounter Text Timer: " + modPlayer.encounterTextTimer);
-                        float intensity = MathHelper.Clamp((1 + (float)Math.Sin((float)modPlayer.encounterTextTimer / 20f)) * 0.25f, 0f, 1f);
-                        if (encounter == 3) intensity += 0.3f;
-                        if (modPlayer.finalText) intensity = 1f;
-                    }
+                    Main.rainTime = 3600;
+                    Main.raining = true;
+                    Main.maxRaining = 0.8f;
                 }
+            }
+
+            ElementsAwoken.encounterTimer--;
+            if (encounter == 1 && ElementsAwoken.encounterTimer <= 1600) ElementsAwoken.encounterTimer = 0; // the first encounter is shorter
+            if (ElementsAwoken.encounterTimer <= 0)
+            {
+                ElementsAwoken.encounterTimer = 0;
+                ElementsAwoken.encounter = 0;
+                return;
+            }
+
+            if (encounter == 2)
+            {
+                Main.time += Main.rand.Next(8, 25);
+                if (Main.time > 32400.0 - 30)
+                {
+                    Main.time = 0;
+                }
+            }
+            if (encounter == 3)
+            {
+                Main.time = 16220;
+                Main.dayTime = false;
             }
         }
     }

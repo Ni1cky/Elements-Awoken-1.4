@@ -43,6 +43,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.TheGuardian
 
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<TheGuardianTrophy>(), 10));
             itemLoot.Add(ItemDropRule.Common(ModContent.ItemType<FieryCore>()));
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.TheGuardian.TheGuardianFly>()));
         }
         public override void RightClick(Player player)
         {

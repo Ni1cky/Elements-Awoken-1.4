@@ -61,7 +61,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Obsidious
             NPC.width = 222;
             NPC.height = 254;
             NPC.aiStyle = -1;
-            NPC.lifeMax = 100000;
+            NPC.lifeMax = 75000;
             NPC.damage = 75;
             NPC.defense = 55;
             NPC.knockBackResist = 0f;
@@ -151,17 +151,15 @@ namespace ElementsAwoken.Content.NPCs.Bosses.Obsidious
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             LeadingConditionRule _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
-            LeadingConditionRule _DropExpert = new LeadingConditionRule(new EAIDRC.DropAwakened());
 
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ModContent.ItemType<ObsidiousRelicItem>()));
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [.. EAList.ObsiLoot]));
-            _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ModContent.ItemType<ObsidiousBag>(), 1));
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<ObsidiousTrophy>(), 10));
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<CrystallineCluster>(), 10));
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<ObsidiousWings>(), 10));
             npcLoot.Add(_DropNormal);
-            npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<ObsidiousBag>()));
 
             var RobeDrop = new LeadingConditionRule(new EAIDRC.DropRobe());
             RobeDrop.OnSuccess(ItemDropRule.Common(ModContent.ItemType<ObsidiousMask>()));

@@ -45,6 +45,9 @@ namespace ElementsAwoken.Content.Items.BossDrops.Regaroth
             itemLoot.Add(_NewItem3);
             _NewItem4.OnSuccess(ItemDropRule.Common(IDropSettings.RegItemId4, chanceDenominator: IDropSettings.RegChanceDenominator4, minimumDropped: IDropSettings.RegMinimumDropped4, maximumDropped: IDropSettings.RegMaximumDropped4));
             itemLoot.Add(_NewItem4);
+
+            // the boss drops one bag per player instead of its money, so the money comes from the bag (as with vanilla bags)
+            itemLoot.Add(ItemDropRule.CoinsBasedOnNPCValue(ModContent.NPCType<global::ElementsAwoken.Content.NPCs.Bosses.Regaroth.RegarothHead>()));
         }
         public override void RightClick(Player player)
         {

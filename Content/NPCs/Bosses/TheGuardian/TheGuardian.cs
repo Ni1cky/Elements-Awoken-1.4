@@ -52,7 +52,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.TheGuardian
             NPC.width = 92;
             NPC.height = 152;
             NPC.aiStyle = -1;
-            NPC.lifeMax = 50000;
+            NPC.lifeMax = 40000;
             NPC.damage = 120;
             NPC.defense = 35;
             NPC.knockBackResist = 0f;

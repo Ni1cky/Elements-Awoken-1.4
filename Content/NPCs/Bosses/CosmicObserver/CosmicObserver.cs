@@ -11,6 +11,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent.ItemDropRules;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -154,7 +155,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.CosmicObserver
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             var _AwakenedMode = new LeadingConditionRule(new EAIDRC.AwakenedModeActive());
-            var _AwakenedModeEssence = new LeadingConditionRule(new EAIDRC.DropAwakened());
+            var _AwakenedModeEssence = new LeadingConditionRule(new EAIDRC.AwakenedModeActive());
             var _AwakenedModeExpert = new LeadingConditionRule(new EAIDRC.DropExpert());
             var _AwakenedModeNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
 
@@ -531,12 +532,17 @@ namespace ElementsAwoken.Content.NPCs.Bosses.CosmicObserver
         }
         public override float SpawnChance(NPCSpawnInfo spawnInfo)
         {
-            if (Main.hardMode && (spawnInfo.Player.ZoneSkyHeight || spawnInfo.Player.ZoneNormalSpace))
-            {
-                if (spawnInfo.Player.GetModPlayer<MyPlayer>().observerChanceTimer > 0) return 0.5f;
-                else return 0.006f;
-            }
-            return 0f;
+            // only one at a time, as in 1.3
+            if (!Main.hardMode || NPC.AnyNPCs(Type) || !(spawnInfo.Player.ZoneSkyHeight || spawnInfo.Player.ZoneNormalSpace)) return 0f;
+            // the summon item greatly increases the chance for a minute (reset in OnSpawn)
+            if (spawnInfo.Player.GetModPlayer<MyPlayer>().observerChanceTimer > 0) return 0.5f;
+            // natural spawns stop once it has been defeated, as in 1.3
+            return MyWorld.downedCosmicObserver ? 0f : 0.006f;
+        }
+        public override void OnSpawn(IEntitySource source)
+        {
+            // one use of the summon item gives one Cosmic Observer
+            foreach (Player player in Main.ActivePlayers) player.GetModPlayer<MyPlayer>().observerChanceTimer = 0;
         }
     }
 }

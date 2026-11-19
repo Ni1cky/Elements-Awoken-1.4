@@ -55,7 +55,7 @@ namespace ElementsAwoken.Content.NPCs.Bosses.TheGuardian
             NPC.width = 252;
             NPC.height = 152;
             NPC.aiStyle = -1;
-            NPC.lifeMax = 200000;
+            NPC.lifeMax = 115000;
             NPC.damage = 120;
             NPC.defense = 45;
             NPC.knockBackResist = 0f;
@@ -125,16 +125,14 @@ namespace ElementsAwoken.Content.NPCs.Bosses.TheGuardian
         public override void ModifyNPCLoot(NPCLoot npcLoot)
         {
             LeadingConditionRule _DropNormal = new LeadingConditionRule(new EAIDRC.DropNormal());
-            LeadingConditionRule _DropExpert = new LeadingConditionRule(new EAIDRC.DropAwakened());
 
             npcLoot.Add(ItemDropRule.ByCondition(new Conditions.IsMasterMode(), ModContent.ItemType<TheGuardianRelicItem>()));
 
             _DropNormal.OnSuccess(ItemDropRule.OneFromOptions(1, [.. EAList.TGuaLoot]));
-            _DropExpert.OnSuccess(ItemDropRule.ByCondition(new Conditions.IsExpert(), ModContent.ItemType<GuardianBag>(), 1));
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<TheGuardianTrophy>(), 10));
             _DropNormal.OnSuccess(ItemDropRule.Common(ModContent.ItemType<TheGuardianMask>(), 10));
             npcLoot.Add(_DropNormal);
-            npcLoot.Add(_DropExpert);
+            npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<GuardianBag>()));
         }
         public override void OnKill()
         {
