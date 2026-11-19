@@ -14,7 +14,7 @@ Elements Awoken aims to add to the experience playing Terraria.
 [*]2 new Post-Moonlord events
 [/list]
 Have any questions regarding the mod? Join the mod's discord server - [url=https://discord.gg/ETJ6NBV] here.[/url]
-The entire source code for the mod is [url=https://github.com/Sernk/Elements-Awoken-1.4/tree/main] here.[/url]
+The entire source code for the mod is [url=https://github.com/Ni1cky/Elements-Awoken-1.4] here.[/url]
 
 Be sure to download the 'Elements Awoken Music' addon if you want the mods music or alternatively download 'EA Retro Music' addon for the old music.
 [b]Credits:[/b]
