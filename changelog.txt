@@ -1,0 +1,39 @@
+Version {ModVersion}: a large bug fix update based on community reports.
+
+[h3]Bosses[/h3]
+[list]
+[*]Every player now gets their own treasure bag in multiplayer, and the bags contain the boss money.
+[*]Bosses in Classic mode now have their normal health instead of Expert mode health.
+[*]Wasteland, Regaroth and Permafrost drop their essences in every difficulty. Void Leviathan now drops Void Essence in Classic and no longer drops it twice in Expert.
+[*]A Wasteland spared by the Dryad now drops its loot and counts as defeated.
+[*]The Cosmic Observer no longer spawns over and over, stops spawning naturally once defeated and no longer drops its shards twice in Expert.
+[*]Azana's reward for sparing her is no longer duplicated in multiplayer.
+[/list]
+
+[h3]Encounters[/h3]
+[list]
+[*]Abraxis' dialogue after the first defeat of Infernace, Permafrost and Void Leviathan is shown again, with the original 1.3 timing, and the encounters now work in multiplayer.
+[/list]
+
+[h3]Gameplay[/h3]
+[list]
+[*]Damage taken effects work again: Chaos Shield, Honey Cocoon, Icy Heart, Void Leviathan's Aegis and Void Energy, Starstruck, Hell's Fury, the Viridium Greatsword dash, Assassin's Knife, Oceanic armor, fall damage reductions (Comfy Pants, Silky Serum, Geltic Conqueror and Arid sets), Dungeon Walker's Boots and Lihzahrdian Explorer's Boots.
+[*]Enemy spawns now stop only during Elements Awoken boss fights; vanilla and other mods' bosses and events spawn enemies normally again. The Void Event keeps spawning enemies while the Shade Wyrm is alive.
+[*]Scorpions, Mutated Scorpions, Sky Crawlers and Stellar Starfish can be hit by minions and sentries again.
+[*]Arid Leggings now give the stats from their tooltip.
+[/list]
+
+[h3]Multiplayer and servers[/h3]
+[list]
+[*]Dedicated servers no longer crash when Permafrost or the Ancients die, or before the Dawn of the Void starts.
+[*]Toy armor, Voidblood Heart and Slime Booster projectiles are no longer duplicated for every player.
+[*]The Ancients' death animation no longer spawns its effects once per player.
+[/list]
+
+[h3]Other[/h3]
+[list]
+[*]Screen tints and filters no longer stay on after their source is gone.
+[*]Helper NPCs and worm body segments no longer have their own bestiary entries, and Infernace's Guardian has its bestiary text.
+[*]Fixed the swapped Infinity Gauntlet mode descriptions, the swapped Nordic War Horn name and tooltip, and Regaroth's name in Boss Checklist.
+[*]The credits no longer break in worlds that lack some of their locations.
+[/list]

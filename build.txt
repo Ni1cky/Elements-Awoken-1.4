@@ -1,7 +1,7 @@
 displayName = Elements Awoken
 author = ThatOneJuicyOrange_, Aeris
-version = 1.3.13.14
+version = 1.3.13.20
 weakReferences = CalamityMod,RecipeBrowser
 modReferences = Luminance
 homepage = https://github.com/Ni1cky/Elements-Awoken-1.4
-buildIgnore = .vs\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, .git\*, .github\*, LICENSE, README.md, .editorconfig, .gitignore, .gitattributes
+buildIgnore = .vs\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, .git\*, .github\*, LICENSE, README.md, .editorconfig, .gitignore, .gitattributes, changelog.txt
